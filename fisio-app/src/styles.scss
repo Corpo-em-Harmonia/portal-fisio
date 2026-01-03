@@ -1,1 +1,329 @@
-/* You can add global styles to this file, and also import other style files */
+/* =========================================================
+   VARIÁVEIS DE TEMA
+   ========================================================= */
+:root {
+  --roxo-principal: #6b3fa0;
+  --roxo-escuro: #2a0a3d;
+  --roxo-claro: #f3eefe;
+
+  --verde-cta: #2fb95a;
+
+  --cinza-texto: #555;
+  --cinza-claro: #f6f7f8;
+  --branco: #ffffff;
+}
+
+/* =========================================================
+   RESET BÁSICO
+   ========================================================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Ubuntu, sans-serif;
+  color: var(--cinza-texto);
+  background: #fff;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+.site-header {
+  width: 100%;
+  background: var(--branco);
+  border-bottom: 1px solid #ececec;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding: 6px 0;
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 8px 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Logo */
+.logo img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Navegação */
+.main-nav {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.main-nav ul {
+  display: flex;
+  gap: 18px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.main-nav a {
+  color: #111;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.main-nav a:hover {
+  background: var(--roxo-claro);
+}
+
+.main-nav a.is-active {
+  background: var(--roxo-claro);
+  color: var(--roxo-principal);
+  font-weight: 600;
+}
+
+/* Ações */
+.header-actions {
+  flex: 0 0 auto;
+}
+
+/* =========================================================
+   MAIN
+   ========================================================= */
+.app-main {
+  padding-top: 18px;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+.hero {
+  background: linear-gradient(180deg, #ffffff 0%, #f7f3fb 100%);
+  padding: 48px 16px;
+}
+
+.hero-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.06);
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 32px;
+  align-items: center;
+}
+
+.hero-content h1 {
+  font-size: clamp(28px, 4vw, 40px);
+  margin: 0 0 12px 0;
+  line-height: 1.1;
+  font-weight: 700;
+  color: #111;
+}
+
+.hero-sub {
+  color: #666;
+  margin-bottom: 22px;
+  max-width: 640px;
+  line-height: 1.5;
+}
+
+.cta-btn {
+  display: inline-block;
+  background: var(--roxo-principal);
+  color: #fff;
+  padding: 12px 22px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.cta-btn:hover {
+  background: #5a3490;
+  transform: translateY(-1px);
+}
+
+.hero-media img {
+  border-radius: 14px;
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  display: block;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+.site-footer {
+  background: linear-gradient(180deg, #2a0a3d 0%, #1e062c 100%);
+  color: #efe7db;
+  padding: 36px 16px 20px;
+  font-size: 14px;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 320px 320px;
+  gap: 32px;
+  align-items: start;
+}
+
+.footer-logo img {
+  width: 260px;
+  height: auto;
+  display: block;
+  margin-bottom: 12px;
+  filter: brightness(1.1) contrast(1.05);
+}
+
+.footer-desc {
+  max-width: 360px;
+  line-height: 1.5;
+  color: rgba(239, 231, 219, 0.95);
+}
+
+.site-footer h6 {
+  color: #fff;
+  margin: 0 0 8px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.footer-list {
+  margin: 8px 0;
+  line-height: 1.6;
+}
+
+.footer-list a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.footer-social {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: flex;
+  gap: 12px;
+}
+
+.footer-social a {
+  color: #efe7db;
+  text-decoration: none;
+}
+
+/* Botão agendar */
+.btn-agendar {
+  display: inline-block;
+  background: var(--verde-cta);
+  color: #072b18;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  margin-top: 12px;
+  transition: transform 0.2s ease;
+}
+
+.btn-agendar:hover {
+  transform: translateY(-1px);
+}
+
+/* Footer bottom */
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin-top: 28px;
+  padding-top: 14px;
+}
+
+.footer-inner--small {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 8px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* =========================================================
+   RESPONSIVO
+   ========================================================= */
+@media (max-width: 900px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .hero-media {
+    margin-top: 20px;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .footer-logo img {
+    width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .main-nav {
+    order: 3;
+    width: 100%;
+  }
+
+  .main-nav ul {
+    justify-content: center;
+    padding: 8px 0;
+  }
+}
+
+@media (max-width: 420px) {
+  .main-nav {
+    overflow-x: auto;
+  }
+
+  .main-nav ul {
+    gap: 10px;
+    padding: 8px;
+  }
+
+  .main-nav::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .main-nav::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+  }
+}
+
+/* Acessibilidade */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
