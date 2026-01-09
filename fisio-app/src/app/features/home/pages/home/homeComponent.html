@@ -7,7 +7,7 @@
         <p class="hero-sub">
             Tratamentos personalizados para sua recuperação, bem-estar e qualidade de vida.
         </p>
-        <a class="cta-btn" routerLink="/start">Quero iniciar tratamento</a>
+        <a class="cta-btn"  (click)="openModal()">Quero iniciar tratamento</a>
         </div>
 
         <div class="hero-media" role="img" aria-label="Fisio">
@@ -16,4 +16,7 @@
     </div>
 </section>
 </div>
+
+<!-- Modal -->
+<app-modal-cadastro [visible]="isModalOpen" (close)="closeModal()"></app-modal-cadastro>
 <!-- ...existing code... -->    

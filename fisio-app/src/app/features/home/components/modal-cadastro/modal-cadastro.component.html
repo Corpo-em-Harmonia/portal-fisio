@@ -1,0 +1,36 @@
+<div class="custom-modal" *ngIf="visible">
+  <div class="custom-modal-content">
+    <span class="custom-modal-close" (click)="close.emit()" title="Fechar">&times;</span>
+    <h2 class="modal-title">{{ titulo }}</h2>
+    <p class="modal-desc">{{ descricao }}</p>
+    <form [formGroup]="form" class="modal-form">
+      <mat-form-field class="modal-field">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" placeholder="Nome" />
+      </mat-form-field>
+      <mat-form-field class="modal-field">
+        <mat-label>Sobrenome</mat-label>
+        <input matInput formControlName="sobrenome" placeholder="Sobrenome" />
+      </mat-form-field>
+      <mat-form-field class="modal-field">
+        <mat-label>Telefone</mat-label>
+        <input matInput formControlName="telefone" placeholder="Telefone" />
+      </mat-form-field>
+      <mat-form-field class="modal-field">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="Ex. pat@example.com" />
+        <mat-hint>Errors appear instantly!</mat-hint>
+        <mat-error *ngIf="form.controls.email.hasError('email') && !form.controls.email.hasError('required')">
+          Please enter a valid email address
+        </mat-error>
+        <mat-error *ngIf="form.controls.email.hasError('required')">
+          Email is <strong>required</strong>
+        </mat-error>
+      </mat-form-field>
+      <div class="modal-actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Enviar</button>
+        <button mat-button type="button" (click)="close.emit()">Fechar</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { Home } from './pages/home/homeComponent';
+import { Home } from './pages/home/modal-cadastro.component';
 
 const routes: Routes = [
     {
