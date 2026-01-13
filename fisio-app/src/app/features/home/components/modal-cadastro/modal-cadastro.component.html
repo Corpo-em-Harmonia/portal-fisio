@@ -27,10 +27,18 @@
           Email is <strong>required</strong>
         </mat-error>
       </mat-form-field>
-      <div class="modal-actions">
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">Enviar</button>
-        <button mat-button type="button" (click)="close.emit()">Fechar</button>
-      </div>
+<div class="modal-actions">
+  <ng-container *ngFor="let btn of buttons">
+    <button
+      mat-raised-button
+      [color]="btn.color || 'primary'"
+      [disabled]="btn.disabled"
+      type="button"
+      (click)="onButtonClick(btn.action)">
+      {{ btn.label }}
+    </button>
+  </ng-container>
+</div>
     </form>
   </div>
 </div>

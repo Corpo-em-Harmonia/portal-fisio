@@ -18,5 +18,9 @@
 </div>
 
 <!-- Modal -->
-<app-modal-cadastro [visible]="isModalOpen" (close)="closeModal()"></app-modal-cadastro>
+<app-modal-cadastro
+  [visible]="isModalOpen"
+  [buttons]="modalButtons"
+  (buttonClick)="onModalButtonClick($event)">
+</app-modal-cadastro>
 <!-- ...existing code... -->    

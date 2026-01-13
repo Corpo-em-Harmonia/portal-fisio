@@ -1,12 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { Home } from './pages/home/modal-cadastro.component';
+import { Home } from './pages/home/homeComponent';
 
 const routes: Routes = [
-    {
-    path: '',
-    component: Home
-  }
+  { path: '', component: Home }
 ];
 
 @NgModule({
