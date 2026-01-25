@@ -1,42 +1,43 @@
-# FisioApp
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+# Portal Fisio
 
-## Development server
+Este projeto é um portal de avaliação e gestão para clínicas de fisioterapia, desenvolvido em Angular, com foco em usabilidade, responsividade e segurança de dados.
 
-To start a local development server, run:
+## Funcionalidades
+- Formulário de Avaliação Fisioterapêutica dinâmico
+- Cadastro e listagem de pacientes (leads)
+- Navegação entre módulos (avaliação, pacientes, agenda, etc.)
+- Upload de arquivos e campos dinâmicos
+- Interface moderna baseada em Figma
+- Suporte a SSR (Server Side Rendering)
 
-```bash
-ng serve
-```
+## Estrutura do Projeto
+- `src/app/features/avaliacao` — Módulo de avaliação fisioterapêutica
+- `src/app/features/pacientes` — Módulo de pacientes/leads
+- `src/app/features/agenda` — Módulo de agenda
+- `src/app/shared` — Modelos e serviços compartilhados
+- `src/styles.scss` — Utilitários e estilos globais
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Como rodar
+1. Instale as dependências:
+	```bash
+	npm install
+	```
+2. Rode o projeto:
+	```bash
+	npm start
+	```
 
-## Code scaffolding
+## Aviso Legal
+**Este projeto é proprietário. Não copie, distribua ou reutilize o código-fonte, componentes, estilos ou qualquer parte deste repositório sem autorização expressa do autor.**
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+O uso não autorizado pode resultar em sanções legais conforme a legislação vigente.
 
-```bash
-ng generate component component-name
-```
+---
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+# ENGLISH
 
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
+**This project is proprietary. Do not copy, distribute, or reuse any part of this repository without explicit permission from the author. Unauthorized use may result in legal action.**
 
 To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
 

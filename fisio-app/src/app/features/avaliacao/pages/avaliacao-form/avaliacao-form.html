@@ -1,1 +1,440 @@
-<p>avaliacao-form works!</p>
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-gray-200 sticky top-0 z-10">
+    <div class="max-w-7xl mx-auto px-4 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <a 
+            (click)="onBack()"
+            class="text-purple-700 hover:underline cursor-pointer px-2 py-1 rounded transition-colors"
+            style="background: none; border: none; outline: none; box-shadow: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="inline align-middle text-purple-700">
+              <path d="m12 19-7-7 7-7"/>
+              <path d="M19 12H5"/>
+            </svg>
+            <span class="align-middle ml-1">Voltar</span>
+          </a>
+          <div>
+            <h1 class="text-2xl font-bold text-gray-900">Avaliação Fisioterapêutica</h1>
+            <p class="text-sm text-gray-600">Paciente: {{ pacienteNome }}</p>
+          </div>
+        </div>
+        <button 
+          type="button"
+          (click)="onSubmit()"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium border-0 outline-none focus:ring-2 focus:ring-purple-500"
+          style="box-shadow: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Salvar Avaliação
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="avaliacaoForm" class="max-w-7xl mx-auto px-4 py-8">
+    <div class="space-y-6">
+      
+      <!-- Identificação -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 bg-purple-100 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">Identificação</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              ID da Avaliação
+            </label>
+            <input
+              type="text"
+              formControlName="avaliacaoId"
+              readonly
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-600"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Fisioterapeuta Responsável *
+            </label>
+            <input
+              type="text"
+              formControlName="medico"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              placeholder="Nome do fisioterapeuta"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Anamnese -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 bg-purple-100 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600">
+              <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+              <path d="M9 14h6"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">Anamnese</h2>
+        </div>
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              HDA - História da Doença Atual *
+            </label>
+            <textarea
+              formControlName="hda"
+              rows="4"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              placeholder="Descreva a queixa principal, início dos sintomas, evolução..."
+            ></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              HPP - História Patológica Pregressa
+            </label>
+            <textarea
+              formControlName="hpp"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              placeholder="Doenças preexistentes, histórico de lesões..."
+            ></textarea>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Medicamentos em Uso
+              </label>
+              <textarea
+                formControlName="medicamentos"
+                rows="3"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                placeholder="Liste os medicamentos e dosagens"
+              ></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">
+                Cirurgias Prévias
+              </label>
+              <textarea
+                formControlName="cirurgia"
+                rows="3"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                placeholder="Descreva cirurgias anteriores e datas"
+              ></textarea>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Comorbidades
+            </label>
+            <textarea
+              formControlName="comorbidades"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              placeholder="Diabetes, Hipertensão, Obesidade, outras condições..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Avaliação Física -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 bg-purple-100 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">Avaliação Física</h2>
+        </div>
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              Testes Realizados *
+            </label>
+            <div formArrayName="testesRealizados" class="space-y-3">
+              @for (teste of testesRealizados.controls; track $index) {
+                <div class="flex items-start gap-3">
+                  <textarea
+                    [formControlName]="$index"
+                    rows="3"
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                    placeholder="Ex: Teste de força muscular - Grau 4/5 em quadríceps bilateral"
+                  ></textarea>
+                  @if (testesRealizados.length > 1) {
+                    <button
+                      type="button"
+                      (click)="removeTeste($index)"
+                      class="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
+                      title="Remover teste">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                      </svg>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+            <button
+              type="button"
+              (click)="addTeste()"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium mt-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/><path d="M12 5v14"/>
+              </svg>
+              Adicionar Mais Testes
+            </button>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              Goniometria (Amplitude de Movimento)
+            </label>
+            <div formArrayName="goniometria" class="space-y-3">
+              @for (gon of goniometria.controls; track $index) {
+                <div [formGroupName]="$index" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <input
+                    type="text"
+                    formControlName="articulacao"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Ex: Joelho direito"
+                  />
+                  <input
+                    type="text"
+                    formControlName="movimentoAvaliado"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Ex: Flexão"
+                  />
+                  <input
+                    type="text"
+                    formControlName="graus"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    placeholder="Graus (0-180)"
+                  />
+                  @if (goniometria.length > 1) {
+                    <button
+                      type="button"
+                      (click)="removeGoniometria($index)"
+                      class="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
+                      title="Remover goniometria">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                      </svg>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+            <button
+              type="button"
+              (click)="addGoniometria()"
+              class="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium mt-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/><path d="M12 5v14"/>
+              </svg>
+              Adicionar Mais Goniometrias
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Diagnóstico e Conduta -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 bg-purple-100 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600">
+              <path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/>
+              <path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/>
+              <circle cx="20" cy="10" r="2"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">Diagnóstico e Conduta</h2>
+        </div>
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Diagnóstico Fisioterapêutico *
+            </label>
+            <textarea
+              formControlName="diagnostico"
+              rows="3"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              placeholder="Diagnóstico cinético funcional..."
+            ></textarea>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              Conduta Terapêutica *
+            </label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              @for (conduta of condutaOptions; track conduta) {
+                <label class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-purple-50 cursor-pointer transition-colors">
+                  <input
+                    type="checkbox"
+                    [value]="conduta"
+                    (change)="onCondutaChange($event)"
+                    class="w-4 h-4 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
+                  />
+                  <span class="text-sm text-gray-700">{{ conduta }}</span>
+                </label>
+              }
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              Prognóstico *
+            </label>
+            <textarea
+              formControlName="prognostico"
+              rows="4"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              placeholder="Descreva o prognóstico do paciente, expectativas de recuperação..."
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Complementos -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 bg-purple-100 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" x2="12" y1="3" y2="15"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">Complementos</h2>
+        </div>
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">
+              Exames e Imagens
+            </label>
+            <p class="text-sm text-gray-500 mb-3">
+              Faça upload de exames, radiografias, laudos médicos e outras imagens
+            </p>
+            <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-purple-300 rounded-lg cursor-pointer hover:bg-purple-50 transition-colors">
+              <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-500 mb-2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" x2="12" y1="3" y2="15"/>
+                </svg>
+                <p class="text-sm text-purple-600 font-medium">
+                  Clique para fazer upload
+                </p>
+                <p class="text-xs text-gray-500 mt-1">
+                  PNG, JPG, PDF até 10MB
+                </p>
+              </div>
+              <input
+                type="file"
+                multiple
+                accept="image/*,application/pdf"
+                (change)="onFileUpload($event)"
+                class="hidden"
+              />
+            </label>
+          </div>
+
+          @if (uploadedFiles.length > 0) {
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-3">
+                Arquivos Anexados ({{ uploadedFiles.length }})
+              </label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                @for (file of uploadedFiles; track $index) {
+                  <div class="flex items-center gap-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                    @if (file.preview) {
+                      <img [src]="file.preview" [alt]="file.name" class="w-12 h-12 object-cover rounded-lg" />
+                    } @else {
+                      <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600">
+                          <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+                          <polyline points="14 2 14 8 20 8"/>
+                        </svg>
+                      </div>
+                    }
+                    <div class="flex-1 min-w-0">
+                      <p class="text-sm font-medium text-gray-900 truncate">
+                        {{ file.name }}
+                      </p>
+                      <p class="text-xs text-gray-500">
+                        {{ formatFileSize(file.size) }}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      (click)="removeFile($index)"
+                      class="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors flex-shrink-0"
+                      title="Remover arquivo">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Observações -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="p-2 bg-purple-100 rounded-lg">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-purple-600">
+              <rect width="8" height="4" x="8" y="2" rx="1" ry="1"/>
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+              <path d="M9 14h6"/>
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900">Observações</h2>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Observações Gerais
+          </label>
+          <textarea
+            formControlName="observacoes"
+            rows="5"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+            placeholder="Adicione observações adicionais sobre a avaliação, comportamento do paciente, orientações específicas..."
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Botão Mobile -->
+      <div class="md:hidden">
+        <button
+          type="button"
+          (click)="onSubmit()"
+          class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          Salvar Avaliação
+        </button>
+      </div>
+
+    </div>
+  </form>
+</div>
