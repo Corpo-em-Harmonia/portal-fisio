@@ -13,8 +13,8 @@
         <input matInput formControlName="sobrenome" placeholder="Sobrenome" />
       </mat-form-field>
       <mat-form-field class="modal-field">
-        <mat-label>Telefone</mat-label>
-        <input matInput formControlName="telefone" placeholder="Telefone" />
+        <mat-label>celular</mat-label>
+        <input matInput formControlName="telefone" placeholder="celular" />
       </mat-form-field>
       <mat-form-field class="modal-field">
         <mat-label>Email</mat-label>
@@ -27,18 +27,18 @@
           Email is <strong>required</strong>
         </mat-error>
       </mat-form-field>
-<div class="modal-actions">
-  <ng-container *ngFor="let btn of buttons">
-    <button
-      mat-raised-button
-      [color]="btn.color || 'primary'"
-      [disabled]="btn.disabled"
-      type="button"
-      (click)="onButtonClick(btn.action)">
-      {{ btn.label }}
-    </button>
-  </ng-container>
-</div>
+      <mat-form-field class="modal-field" floatLabel="always">
+        <mat-label>Motivo</mat-label>
+        <textarea matInput formControlName="motivo" placeholder="Motivo" rows="4"></textarea>
+      </mat-form-field>
+      <div class="modal-actions">
+        <ng-container *ngFor="let btn of buttons">
+          <button mat-raised-button [color]="btn.color || 'primary'" [disabled]="btn.disabled" type="button"
+            (click)="onButtonClick(btn.action)">
+            {{ btn.label }}
+          </button>
+        </ng-container>
+      </div>
     </form>
   </div>
 </div>
