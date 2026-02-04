@@ -20,6 +20,10 @@ export class LeadService extends BaseService<Lead> {
         const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
         return this.createLead(lead);
     }
+    
+    getLeads(): Observable<Lead[]> {
+    return this.http.get<Lead[]>(this.geFullUrl());
+    }
 
     
 }

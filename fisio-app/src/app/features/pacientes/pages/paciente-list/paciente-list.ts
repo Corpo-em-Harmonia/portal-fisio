@@ -1,15 +1,9 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-
-interface Lead {
-  id: string;
-  nome: string;
-  telefone: string;
-  dataContato: string;
-  status: 'novo' | 'aguardando_avaliacao' | 'em_tratamento' | 'finalizado';
-}
-
+import { LeadService } from '../../../../shared/service/lead.service';
+import { OnInit } from '@angular/core';
+import { Lead } from '../../../../shared/models/lead';
 @Component({
   selector: 'app-paciente-list',
   standalone: true,
@@ -17,37 +11,8 @@ interface Lead {
   templateUrl: './paciente-list.html',
   styleUrl: './paciente-list.scss',
 })
-export class PacienteList {
-  mockLeads: Lead[] = [
-    {
-      id: '1',
-      nome: 'Maria Silva',
-      telefone: '(11) 98765-4321',
-      dataContato: '2026-01-20',
-      status: 'aguardando_avaliacao'
-    },
-    {
-      id: '2',
-      nome: 'João Santos',
-      telefone: '(11) 97654-3210',
-      dataContato: '2026-01-22',
-      status: 'novo'
-    },
-    {
-      id: '3',
-      nome: 'Ana Costa',
-      telefone: '(11) 96543-2109',
-      dataContato: '2026-01-23',
-      status: 'aguardando_avaliacao'
-    },
-    {
-      id: '4',
-      nome: 'Pedro Oliveira',
-      telefone: '(11) 95432-1098',
-      dataContato: '2026-01-24',
-      status: 'novo'
-    }
-  ];
+export class PacienteList implements OnInit {
+  leads: Lead[] = [];
 
   statusColors: Record<Lead['status'], string> = {
     novo: 'bg-blue-100 text-blue-700',
@@ -63,16 +28,31 @@ export class PacienteList {
     finalizado: 'Finalizado'
   };
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private leadService: LeadService,  private cdr: ChangeDetectorRef) { }
+
+
+    ngOnInit(): void {
+      this.leadService.getLeads().subscribe({
+        next: (dados) => {
+          this.leads = dados.map(lead => ({
+            ...lead,
+            status: lead.status.toLowerCase() as Lead['status'],
+          }));
+             this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Erro ao buscar leads', err)
+      });
+    }
 
   onSelectLead(lead: Lead): void {
     // Navegar para avaliação passando o nome do paciente
     this.router.navigate(['/avaliacao'], { queryParams: { nome: lead.nome } });
   }
 
-  formatDate(dateString: string): string {
+  formatDate(dateString: string | null | undefined): string {
+    if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR');
+    return isNaN(date.getTime()) ? '' : date.toLocaleDateString('pt-BR');
   }
 
   getInitial(name: string): string {
@@ -85,5 +65,9 @@ export class PacienteList {
 
   getStatusLabel(status: Lead['status']): string {
     return this.statusLabels[status];
+  }
+
+  trackById(index: number, lead: Lead) {
+    return lead.id;
   }
 }

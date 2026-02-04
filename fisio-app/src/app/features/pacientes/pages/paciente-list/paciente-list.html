@@ -26,8 +26,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (lead of mockLeads; track lead.id) {
-            <tr (click)="onSelectLead(lead)">
+          <tr *ngFor="let lead of leads; trackBy: trackById" (click)="onSelectLead(lead)">
               <td class="nome-cell">
                 <span class="avatar-circle">{{ getInitial(lead.nome) }}</span>
                 <span>{{ lead.nome }}</span>
@@ -48,7 +47,7 @@
                     <line x1="8" x2="8" y1="2" y2="6"/>
                     <line x1="3" x2="21" y1="10" y2="10"/>
                   </svg>
-                  {{ formatDate(lead.dataContato) }}
+                  {{ formatDate(lead.date) }}
                 </span>
               </td>
               <td>
@@ -68,7 +67,6 @@
                 </a>
               </td>
             </tr>
-          }
         </tbody>
       </table>
     </div>

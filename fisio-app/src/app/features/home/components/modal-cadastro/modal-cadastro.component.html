@@ -13,13 +13,12 @@
         <input matInput formControlName="sobrenome" placeholder="Sobrenome" />
       </mat-form-field>
       <mat-form-field class="modal-field">
-        <mat-label>celular</mat-label>
-        <input matInput formControlName="telefone" placeholder="celular" />
+        <mat-label>Celular*</mat-label>
+        <input matInput formControlName="celular" placeholder="Celular" />
       </mat-form-field>
       <mat-form-field class="modal-field">
         <mat-label>Email</mat-label>
         <input matInput type="email" formControlName="email" placeholder="Ex. pat@example.com" />
-        <mat-hint>Errors appear instantly!</mat-hint>
         <mat-error *ngIf="form.controls.email.hasError('email') && !form.controls.email.hasError('required')">
           Please enter a valid email address
         </mat-error>
@@ -27,18 +26,19 @@
           Email is <strong>required</strong>
         </mat-error>
       </mat-form-field>
-      <mat-form-field class="modal-field" floatLabel="always">
-        <mat-label>Motivo</mat-label>
-        <textarea matInput formControlName="motivo" placeholder="Motivo" rows="4"></textarea>
-      </mat-form-field>
-      <div class="modal-actions">
-        <ng-container *ngFor="let btn of buttons">
-          <button mat-raised-button [color]="btn.color || 'primary'" [disabled]="btn.disabled" type="button"
-            (click)="onButtonClick(btn.action)">
-            {{ btn.label }}
-          </button>
-        </ng-container>
-      </div>
+        <div class="modal-actions">
+            <ng-container *ngFor="let btn of buttons">
+              <button
+                mat-raised-button
+                [color]="btn.color || 'primary'"
+                [ngClass]="btn.action === 'enviar' ? 'btn-enviar-pill' : ''"
+                [disabled]="btn.disabled || (btn.action === 'enviar' && form.invalid)"
+                type="button"
+                (click)="onButtonClick(btn.action)">
+                {{ btn.label }}
+              </button>
+            </ng-container>
+        </div>
     </form>
   </div>
 </div>

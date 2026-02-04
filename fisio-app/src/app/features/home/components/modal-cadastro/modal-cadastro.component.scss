@@ -52,21 +52,6 @@ form {
   gap: 1rem;
 }
 
-button {
-  margin-top: 1.5rem;
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 30px;
-  border: none;
-  background: #6c63ff;
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-button:hover {
-  background: #5548c8;
-}
 
 .modal-form {
   display: flex;
@@ -83,4 +68,27 @@ button:hover {
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1.5rem;
+}
+
+.btn-enviar-pill {
+  border-radius: 30px !important;
+  min-width: 140px;
+  padding: 0 2rem;
+  font-weight: 600;
+  box-shadow: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+// Estado habilitado (roxo)
+.btn-enviar-pill.mat-primary:not(:disabled) {
+  background: #6c63ff !important;
+  color: #fff !important;
+}
+
+// Estado desabilitado (cinza)
+.btn-enviar-pill.mat-primary:disabled,
+.btn-enviar-pill.mat-primary[disabled] {
+  background: #e0e0e0 !important;
+  color: #bdbdbd !important;
+  cursor: not-allowed;
 }
