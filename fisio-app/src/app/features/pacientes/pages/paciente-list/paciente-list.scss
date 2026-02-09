@@ -96,7 +96,7 @@ td.acao-cell {
   justify-content: flex-end;
   height: 100%;
   min-height: 48px;
-  padding-right: $space-2;
+  padding-right: 16px; // aumente aqui
 }
 
 .acao-link {

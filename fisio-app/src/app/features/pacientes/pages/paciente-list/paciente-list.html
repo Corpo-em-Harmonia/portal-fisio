@@ -47,7 +47,7 @@
                     <line x1="8" x2="8" y1="2" y2="6"/>
                     <line x1="3" x2="21" y1="10" y2="10"/>
                   </svg>
-                  {{ formatDate(lead.date) }}
+                  {{ formatDate(lead.criadoEm) }}
                 </span>
               </td>
               <td>
@@ -55,17 +55,21 @@
                   {{ getStatusLabel(lead.status) }}
                 </span>
               </td>
-              <td class="acao-cell">
-                <a 
-                  [routerLink]="['/avaliacao']"
-                  [queryParams]="{ nome: lead.nome }"
-                  class="acao-link">
-                  Avaliar
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m9 18 6-6-6-6"/>
-                  </svg>
-                </a>
-              </td>
+                <td class="acao-cell" (click)="$event.stopPropagation()">
+                  <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Ações">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu" xPosition="after">
+                    <button mat-menu-item (click)="onEditarLead(lead)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Editar</span>
+                    </button>
+                    <button mat-menu-item (click)="onExcluirLead(lead)">
+                      <mat-icon>delete</mat-icon>
+                      <span>Excluir</span>
+                    </button>
+                  </mat-menu>
+                </td>
             </tr>
         </tbody>
       </table>

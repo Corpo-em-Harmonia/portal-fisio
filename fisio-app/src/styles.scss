@@ -1,7 +1,9 @@
+
 /* =========================================================
-   DESIGN SYSTEM - FISIOTERAPIA THAÍS CUNHA
+   DESIGN SYSTEM - FISIOTERAPIA   Thalia CUNHA
    ========================================================= */
 @use './styles/mixins' as *;
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 /* =========================================================
    RESET BÁSICO
@@ -52,7 +54,7 @@ body {
 }
 
 .main-nav {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   justify-content: center;
 }
@@ -361,4 +363,24 @@ body {
 
 body, html {
   font-family: 'Roboto', Arial, Helvetica, sans-serif;
+}
+
+::ng-deep .snackbar-custom {
+  background: #fff !important;
+  color: #6c2eb5 !important;
+  border-radius: 16px !important;
+  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 16px 0 rgba(108,46,181,0.08);
+  padding: 16px 24px !important;
+  min-width: 280px;
+  max-width: 400px;
+  display: flex;
+  align-items: center;
+}
+
+::ng-deep .snackbar-custom .mat-simple-snackbar-action {
+  color: #6c2eb5 !important;
+  font-weight: bold;
+  letter-spacing: 1px;
 }

@@ -5,19 +5,19 @@
     <p class="modal-desc">{{ descricao }}</p>
     <form [formGroup]="form" class="modal-form">
       <mat-form-field class="modal-field">
-        <mat-label>Nome</mat-label>
+        <mat-label>Nome </mat-label>
         <input matInput formControlName="nome" placeholder="Nome" />
       </mat-form-field>
       <mat-form-field class="modal-field">
-        <mat-label>Sobrenome</mat-label>
+        <mat-label>Sobrenome </mat-label>
         <input matInput formControlName="sobrenome" placeholder="Sobrenome" />
       </mat-form-field>
       <mat-form-field class="modal-field">
-        <mat-label>Celular*</mat-label>
-        <input matInput formControlName="celular" placeholder="Celular" />
+        <mat-label>Telefone </mat-label>
+        <input matInput formControlName="telefone" placeholder="Telefone" />
       </mat-form-field>
       <mat-form-field class="modal-field">
-        <mat-label>Email</mat-label>
+        <mat-label>Email </mat-label>
         <input matInput type="email" formControlName="email" placeholder="Ex. pat@example.com" />
         <mat-error *ngIf="form.controls.email.hasError('email') && !form.controls.email.hasError('required')">
           Please enter a valid email address
@@ -31,8 +31,8 @@
               <button
                 mat-raised-button
                 [color]="btn.color || 'primary'"
-                [ngClass]="btn.action === 'enviar' ? 'btn-enviar-pill' : ''"
-                [disabled]="btn.disabled || (btn.action === 'enviar' && form.invalid)"
+                [ngClass]="btn.action === 'criar-lead' ? 'btn-enviar-pill' : ''"
+                [disabled]="btn.disabled || (btn.action === 'criar-lead' && form.invalid)"
                 type="button"
                 (click)="onButtonClick(btn.action)">
                 {{ btn.label }}

@@ -4,10 +4,13 @@ import { Router, RouterModule } from '@angular/router';
 import { LeadService } from '../../../../shared/service/lead.service';
 import { OnInit } from '@angular/core';
 import { Lead } from '../../../../shared/models/lead';
+import {MatIconModule} from '@angular/material/icon';
+import {MatButtonModule} from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 @Component({
   selector: 'app-paciente-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule,MatIconModule, MatMenuModule, MatButtonModule],
   templateUrl: './paciente-list.html',
   styleUrl: './paciente-list.scss',
 })
@@ -70,4 +73,12 @@ export class PacienteList implements OnInit {
   trackById(index: number, lead: Lead) {
     return lead.id;
   }
+
+  onEditarLead(lead: any) {
+  // lógica para editar o lead
+}
+
+onExcluirLead(lead: any) {
+  // lógica para excluir o lead
+}
 }

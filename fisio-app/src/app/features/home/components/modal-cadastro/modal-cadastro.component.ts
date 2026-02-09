@@ -22,12 +22,12 @@ export class ModalCadastroComponent {
   form = new FormGroup({
     nome: new FormControl('', Validators.required),
     sobrenome: new FormControl('', Validators.required),
-    celular: new FormControl('', Validators.required),
+    telefone: new FormControl('', Validators.required),
     email: new FormControl('', [Validators.required, Validators.email]),
-    motivo: new FormControl('', Validators.required)
   });
 
   onButtonClick(action: string) {
+      console.log('Botão clicado:', action, this.form.value);
     this.buttonClick.emit({ action, value: this.form.value });
   }
 }

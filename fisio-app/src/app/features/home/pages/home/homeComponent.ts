@@ -11,6 +11,8 @@ import { ModalCadastroComponent } from '../../components/modal-cadastro/modal-ca
 import { LeadService } from '../../../../shared/service/lead.service';
 import { Lead } from '../../../../shared/models/lead';
 import { Input, Output, EventEmitter } from '@angular/core';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-home',
@@ -23,7 +25,8 @@ import { Input, Output, EventEmitter } from '@angular/core';
     MatInputModule,
     MatFormFieldModule,
     ReactiveFormsModule,
-    ModalCadastroComponent
+    ModalCadastroComponent,
+    MatSnackBarModule,
   ],
   templateUrl: './homeComponent.html',
   styleUrls: ['./homeComponent.scss'],
@@ -35,10 +38,11 @@ export class Home {
   modalVisivel = false;
 
   modalButtons = [
-    { label: 'Enviar', action: 'enviar', color: 'primary' },
+    { label: 'Enviar', action: 'criar-lead', color: 'primary' },
     { label: 'Fechar', action: 'fechar', color: 'basic' }
   ];
   isModalOpen = false;
+
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
 
   openModal() {
@@ -49,26 +53,37 @@ export class Home {
     this.isModalOpen = false;
   }
 
-  constructor(private leadService: LeadService) { }
+  constructor(private leadService: LeadService,private snackBar: MatSnackBar) { }
 
   onModalButtonClick(event: { action: string, value: any }) {
-    if (event.action === 'salvar') {
+  if (event.action === 'criar-lead') {
       console.log('Salvar lead acionado');
-      this.salvarLead(event.value);
+      this.criarLead(event.value);
+      this.closeModal();
     } else if (event.action === 'fechar') {
       this.modalVisivel = false;
       this.closeModal();
     }
   }
-  salvarLead(formValue: any) {
+
+  criarLead(formValue: any) {
     if (formValue && formValue.email) {
-      this.leadService.salvarLead(formValue as Lead).subscribe({
+      this.leadService.criarLead(formValue as Lead).subscribe({
         next: (response) => {
-          console.log('Lead salvo com sucesso:', response);
-          this.closeModal();
+          this.isModalOpen = false;
+          this.snackBar.open('Contato enviado com sucesso! Em breve entraremos em contato.', 'Fechar', {
+            duration: 4000,
+            panelClass: ['snackbar-custom']
+          }
+        
+        );
+          // Atualize a lista se necessário
         },
         error: (err) => {
-          console.error('Erro ao salvar lead:', err);
+          this.snackBar.open('Erro ao enviar contato. Tente novamente.', 'Fechar', {
+            duration: 4000,
+            panelClass: ['snackbar-custom']
+          });
         }
       });
     }

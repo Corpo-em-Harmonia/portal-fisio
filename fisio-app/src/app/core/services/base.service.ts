@@ -8,7 +8,7 @@ export abstract class BaseService<T> {
     protected abstract pathUrl: string;
 
     geFullUrl(): string {
-        const baseUrl = 'http://localhost:8080/api/public';
+        const baseUrl = 'http://localhost:8080/api';
 
         return `${baseUrl}/${this.pathUrl}`;
     }

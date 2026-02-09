@@ -16,7 +16,7 @@ export class LeadService extends BaseService<Lead> {
 
     protected override pathUrl: string = 'leads';
 
-    salvarLead(lead: Lead): Observable<Lead> {
+    criarLead(lead: Lead): Observable<Lead> {
         const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
         return this.createLead(lead);
     }
