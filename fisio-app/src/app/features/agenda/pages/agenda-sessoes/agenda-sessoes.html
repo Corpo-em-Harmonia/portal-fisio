@@ -1,0 +1,99 @@
+<div class="agenda-container">
+  <div class="agenda-header">
+    <div class="avatar-circle">
+      <mat-icon>event</mat-icon>
+    </div>
+
+    <div class="header-text">
+      <h1 class="agenda-title">Agenda - Sessões (Recepção)</h1>
+      <p class="agenda-sub">Marque comparecimento, faltas e remarcações</p>
+    </div>
+
+    <div class="header-actions">
+      <mat-form-field appearance="outline" class="date-field">
+        <mat-label>Dia</mat-label>
+        <input matInput type="date" [value]="selectedDate" (change)="onDateChange($any($event.target).value)" />
+      </mat-form-field>
+
+      <button mat-stroked-button color="primary" type="button" (click)="carregar()">
+        <mat-icon>refresh</mat-icon>
+        Atualizar
+      </button>
+    </div>
+  </div>
+
+  <div class="agenda-table">
+    <div style="overflow-x:auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>Telefone</th>
+            <th>Data/Hora</th>
+            <th>Status</th>
+            <th class="acao">Ação</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let s of sessoes">
+            <td class="nome-cell">
+              <span class="avatar-circle">{{ (s.pacienteNome?.charAt(0) || 'P') | uppercase }}</span>
+              <span>{{ s.pacienteNome || s.pacienteId }}</span>
+            </td>
+
+            <td>
+              <span class="muted">{{ s.pacienteTelefone || '-' }}</span>
+            </td>
+
+            <td>
+              <span class="muted">{{ formatDateTime(s.dataHora) }}</span>
+            </td>
+
+            <td>
+              <span class="status-badge" [ngClass]="getStatusClass(s.status)">
+                {{ getStatusLabel(s.status) }}
+              </span>
+            </td>
+
+            <td class="acao-cell" (click)="$event.stopPropagation()">
+              <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Ações">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+
+              <mat-menu #menu="matMenu" xPosition="after">
+                <button mat-menu-item (click)="aplicarAcao(s, 'COMPARECEU')" [disabled]="!pode('COMPARECEU', s)">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>Marcar compareceu</span>
+                </button>
+
+                <button mat-menu-item (click)="aplicarAcao(s, 'FALTOU')" [disabled]="!pode('FALTOU', s)">
+                  <mat-icon>person_off</mat-icon>
+                  <span>Marcar faltou</span>
+                </button>
+
+                <button mat-menu-item (click)="aplicarAcao(s, 'REMARCAR')" [disabled]="!pode('REMARCAR', s)">
+                  <mat-icon>schedule</mat-icon>
+                  <span>Remarcar</span>
+                </button>
+
+                <mat-divider></mat-divider>
+
+                <button mat-menu-item (click)="aplicarAcao(s, 'CANCELAR')" [disabled]="!pode('CANCELAR', s)">
+                  <mat-icon>cancel</mat-icon>
+                  <span>Cancelar</span>
+                </button>
+              </mat-menu>
+            </td>
+          </tr>
+
+          <tr *ngIf="sessoes.length === 0">
+            <td colspan="5" class="empty-row">
+              Nenhuma sessão para este dia.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

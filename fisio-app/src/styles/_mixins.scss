@@ -1,0 +1,235 @@
+/* =========================================================
+   MIXINS - UTILIDADES REUTILIZÁVEIS
+   ========================================================= */
+@forward './variables';
+@use './variables' as *;
+
+/* RESPONSIVIDADE */
+@mixin respond-to($breakpoint) {
+  @if $breakpoint == xs {
+    @media (max-width: $breakpoint-xs) { @content; }
+  } @else if $breakpoint == sm {
+    @media (max-width: $breakpoint-sm) { @content; }
+  } @else if $breakpoint == md {
+    @media (max-width: $breakpoint-md) { @content; }
+  } @else if $breakpoint == lg {
+    @media (max-width: $breakpoint-lg) { @content; }
+  } @else if $breakpoint == xl {
+    @media (max-width: $breakpoint-xl) { @content; }
+  }
+}
+
+/* CONTAINER PADRÃO */
+@mixin container {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: 0 $container-padding;
+}
+
+/* CARD BASE */
+@mixin card-base {
+  background: $white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  border: 1px solid $purple-border;
+  transition: $transition-all;
+}
+
+@mixin card-hover {
+  &:hover {
+    box-shadow: $shadow-purple;
+    transform: translateY(-2px);
+  }
+}
+
+/* BOTÃO BASE */
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $space-2;
+  padding: $space-3 $space-5;
+  border-radius: $radius-md;
+  font-size: $font-sm;
+  font-weight: $font-medium;
+  cursor: pointer;
+  transition: $transition-all;
+  border: none;
+  text-decoration: none;
+  white-space: nowrap;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: $gradient-purple;
+  color: $white;
+  
+  &:hover:not(:disabled) {
+    box-shadow: $shadow-purple-md;
+    transform: translateY(-1px);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: $white;
+  color: $purple-primary;
+  border: 1px solid $purple-border;
+  
+  &:hover:not(:disabled) {
+    background: $purple-lighter;
+  }
+}
+
+@mixin button-outline {
+  @include button-base;
+  background: transparent;
+  color: $purple-primary;
+  border: 1px solid $purple-primary;
+  
+  &:hover:not(:disabled) {
+    background: $purple-lighter;
+  }
+}
+
+/* INPUT/SELECT BASE */
+@mixin input-base {
+  width: 100%;
+  padding: $space-3 $space-4;
+  border: 1px solid $gray-300;
+  border-radius: $radius-sm;
+  font-size: $font-sm;
+  color: $gray-900;
+  background: $white;
+  transition: $transition-base;
+  
+  &:focus {
+    outline: none;
+    border-color: $purple-primary;
+    box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.1);
+  }
+  
+  &::placeholder {
+    color: $gray-400;
+  }
+  
+  &:disabled {
+    background: $gray-100;
+    cursor: not-allowed;
+  }
+}
+
+/* FLEXBOX UTILITIES */
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+/* TEXTO TRUNCADO */
+@mixin text-truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* SCROLLBAR CUSTOMIZADA */
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $gray-100;
+    border-radius: $radius-sm;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $gray-300;
+    border-radius: $radius-sm;
+    
+    &:hover {
+      background: $gray-400;
+    }
+  }
+}
+
+/* GRADIENT TEXT */
+@mixin gradient-text {
+  background: $gradient-purple;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ASPECT RATIO */
+@mixin aspect-ratio($width, $height) {
+  aspect-ratio: $width / $height;
+  
+  @supports not (aspect-ratio: 1 / 1) {
+    &::before {
+      content: '';
+      display: block;
+      padding-top: calc(($height / $width) * 100%);
+    }
+  }
+}
+
+/* SKELETON LOADING */
+@mixin skeleton {
+  background: linear-gradient(
+    90deg,
+    $gray-200 0%,
+    $gray-100 50%,
+    $gray-200 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* GLASSMORPHISM */
+@mixin glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* FOCUS VISIBLE */
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid $purple-primary;
+    outline-offset: 2px;
+  }
+}

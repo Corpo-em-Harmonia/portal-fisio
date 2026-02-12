@@ -7,10 +7,12 @@ import { RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { ModalCadastroComponent } from '../../components/modal-cadastro/modal-cadastro.component'; 
+import { ModalCadastroComponent } from '../../components/modal-cadastro/modal-cadastro.component';
 import { LeadService } from '../../../../shared/service/lead.service';
 import { Lead } from '../../../../shared/models/lead';
 import { Input, Output, EventEmitter } from '@angular/core';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-home',
@@ -20,10 +22,11 @@ import { Input, Output, EventEmitter } from '@angular/core';
     RouterModule,
     MatMenuModule,
     MatButtonModule,
-        MatInputModule,  
-    MatFormFieldModule,   
-   ReactiveFormsModule,
-    ModalCadastroComponent
+    MatInputModule,
+    MatFormFieldModule,
+    ReactiveFormsModule,
+    ModalCadastroComponent,
+    MatSnackBarModule,
   ],
   templateUrl: './homeComponent.html',
   styleUrls: ['./homeComponent.scss'],
@@ -32,12 +35,41 @@ export class Home {
   @ViewChild(MatMenuTrigger) trigger!: MatMenuTrigger;
 
   @Output() buttonClick = new EventEmitter<string>();
+  modalVisivel = false;
+
   modalButtons = [
-  { label: 'Enviar', color: 'primary', action: 'salvar', disabled: false },
-  { label: 'Fechar', color: '', action: 'fechar', disabled: false }
+    { label: 'Chamar no WhatsApp', action: 'whatsapp', color: 'primary' },
+    { label: 'Ligar', action: 'ligar', color: 'basic' },
+    { label: 'Quero que me chamem', action: 'criar-lead', color: 'accent' },
   ];
+
+  private readonly WHATSAPP_PHONE = '5511999999999'; // coloca o número real
+  private readonly PHONE = '+5511999999999';
+
   isModalOpen = false;
+
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
+
+
+  abrirWhatsapp(): void {
+    const msg = encodeURIComponent('Olá! Quero agendar uma avaliação de fisioterapia.');
+    window.open(`https://wa.me/${this.WHATSAPP_PHONE}?text=${msg}`, '_blank');
+  }
+
+    ligar(): void {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        window.location.href = `tel:${this.PHONE}`;
+      } else {
+        navigator.clipboard.writeText(this.PHONE);
+        this.snackBar.open(
+          'Número copiado! Ligue pelo seu telefone.',
+          'Fechar',
+          { duration: 4000 }
+        );
+      }
+    }
 
   openModal() {
     this.isModalOpen = true;
@@ -47,27 +79,47 @@ export class Home {
     this.isModalOpen = false;
   }
 
-  constructor(private leadService: LeadService) {}
+  constructor(private leadService: LeadService,private snackBar: MatSnackBar) { }
 
-  onModalButtonClick(event: { action: string, value: any }) {
-    if (event.action === 'salvar') {
-      console.log('Salvar lead acionado');
-      this.salvarLead(event.value);
-    } else if (event.action === 'fechar') {
+onModalButtonClick(event: { action: string; value?: any }) {
+  switch (event.action) {
+    case 'whatsapp':
+      this.abrirWhatsapp();
       this.closeModal();
-    }
-  }
-salvarLead(formValue: any) {
-  if (formValue && formValue.email) {
-    this.leadService.salvarLead(formValue as Lead).subscribe({
-      next: (response) => {
-        console.log('Lead salvo com sucesso:', response);
-        this.closeModal();
-      },
-      error: (err) => {
-        console.error('Erro ao salvar lead:', err);
-      }
-    });
+      return;
+
+    case 'ligar':
+      this.ligar();
+      this.closeModal();
+      return;
+
+    case 'criar-lead':
+      this.criarLead(event.value);
+      // criarLead já fecha e mostra snackbar
+      return;
   }
 }
+
+  criarLead(formValue: any) {
+    if (formValue && formValue.email) {
+      this.leadService.criarLead(formValue as Lead).subscribe({
+        next: (response) => {
+          this.isModalOpen = false;
+          this.snackBar.open('Contato enviado com sucesso! Em breve entraremos em contato.', 'Fechar', {
+            duration: 4000,
+            panelClass: ['snackbar-custom']
+          }
+        
+        );
+          // Atualize a lista se necessário
+        },
+        error: (err) => {
+          this.snackBar.open('Erro ao enviar contato. Tente novamente.', 'Fechar', {
+            duration: 4000,
+            panelClass: ['snackbar-custom']
+          });
+        }
+      });
+    }
+  }
 }

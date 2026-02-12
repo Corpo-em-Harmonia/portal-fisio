@@ -1,0 +1,158 @@
+/* =========================================================
+   DESIGN SYSTEM - FISIOTERAPIA THAÍS CUNHA
+   Sistema de design unificado para todo o portal
+   ========================================================= */
+
+/* CORES PRIMÁRIAS */
+$purple-primary: #9333ea;
+$purple-dark: #7e22ce;
+$purple-darker: #6b21a8;
+$purple-light: #f3e8ff;
+$purple-lighter: #faf5ff;
+$purple-border: #e9d5ff;
+$purple-medium: #d8b4fe;
+
+/* CORES SECUNDÁRIAS */
+$blue: #3b82f6;
+$blue-light: #dbeafe;
+$blue-dark: #1e40af;
+
+$green: #10b981;
+$green-light: #d1fae5;
+$green-dark: #065f46;
+
+$orange: #f97316;
+$orange-light: #ffedd5;
+$orange-dark: #9a3412;
+
+$red: #dc2626;
+$red-light: #fee2e2;
+$red-dark: #991b1b;
+
+/* ESCALA DE CINZAS */
+$gray-50: #f9fafb;
+$gray-100: #f3f4f6;
+$gray-200: #e5e7eb;
+$gray-300: #d1d5db;
+$gray-400: #9ca3af;
+$gray-500: #6b7280;
+$gray-600: #4b5563;
+$gray-700: #374151;
+$gray-800: #1f2937;
+$gray-900: #111827;
+
+$white: #ffffff;
+$black: #000000;
+
+/* GRADIENTES */
+$gradient-purple: linear-gradient(135deg, $purple-primary 0%, $purple-dark 100%);
+$gradient-purple-soft: linear-gradient(135deg, $purple-light 0%, $white 100%);
+$gradient-dark: linear-gradient(180deg, #2a0a3d 0%, #1e062c 100%);
+
+/* TIPOGRAFIA */
+$font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Ubuntu, 'Helvetica Neue', sans-serif;
+$font-family-mono: 'Monaco', 'Courier New', monospace;
+
+/* Tamanhos de Fonte Responsivos */
+$font-xs: clamp(11px, 1vw, 12px);
+$font-sm: clamp(13px, 1.2vw, 14px);
+$font-base: clamp(14px, 1.3vw, 16px);
+$font-lg: clamp(16px, 1.5vw, 18px);
+$font-xl: clamp(18px, 2vw, 20px);
+$font-2xl: clamp(22px, 2.5vw, 24px);
+$font-3xl: clamp(28px, 3.5vw, 32px);
+$font-4xl: clamp(32px, 4vw, 40px);
+
+/* Line Heights */
+$leading-tight: 1.2;
+$leading-normal: 1.5;
+$leading-relaxed: 1.75;
+
+/* Font Weights */
+$font-normal: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+
+/* ESPAÇAMENTOS (Sistema 4pt) */
+$space-1: 0.25rem;  // 4px
+$space-2: 0.5rem;   // 8px
+$space-3: 0.75rem;  // 12px
+$space-4: 1rem;     // 16px
+$space-5: 1.25rem;  // 20px
+$space-6: 1.5rem;   // 24px
+$space-7: 1.75rem;  // 28px
+$space-8: 2rem;     // 32px
+$space-10: 2.5rem;  // 40px
+$space-12: 3rem;    // 48px
+$space-16: 4rem;    // 64px
+
+/* Espaçamentos Responsivos */
+$spacing-xs: clamp(8px, 1.5vw, 12px);
+$spacing-sm: clamp(12px, 2vw, 16px);
+$spacing-md: clamp(16px, 2.5vw, 24px);
+$spacing-lg: clamp(24px, 3vw, 32px);
+$spacing-xl: clamp(32px, 4vw, 48px);
+
+/* BORDAS E RAIOS */
+$radius-xs: 0.25rem;  // 4px
+$radius-sm: 0.5rem;   // 8px
+$radius-md: 0.75rem;  // 12px
+$radius-lg: 1rem;     // 16px
+$radius-xl: 1.25rem;  // 20px
+$radius-2xl: 1.5rem;  // 24px
+$radius-full: 9999px;
+
+/* SOMBRAS */
+$shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 8px 20px rgba(0, 0, 0, 0.12);
+$shadow-xl: 0 12px 32px rgba(0, 0, 0, 0.16);
+$shadow-2xl: 0 20px 48px rgba(0, 0, 0, 0.2);
+
+/* Sombras Coloridas */
+$shadow-purple: 0 4px 12px rgba(147, 51, 234, 0.15);
+$shadow-purple-md: 0 8px 20px rgba(147, 51, 234, 0.25);
+$shadow-purple-lg: 0 12px 32px rgba(147, 51, 234, 0.3);
+
+/* TRANSIÇÕES */
+$transition-fast: 0.15s ease;
+$transition-base: 0.2s ease;
+$transition-slow: 0.3s ease;
+$transition-all: all 0.2s ease;
+
+/* Z-INDEX */
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-fixed: 1030;
+$z-modal-backdrop: 1040;
+$z-modal: 1050;
+$z-popover: 1060;
+$z-tooltip: 1070;
+
+/* BREAKPOINTS */
+$breakpoint-xs: 380px;
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+/* LARGURAS MÁXIMAS */
+$max-width-xs: 20rem;   // 320px
+$max-width-sm: 24rem;   // 384px
+$max-width-md: 28rem;   // 448px
+$max-width-lg: 32rem;   // 512px
+$max-width-xl: 36rem;   // 576px
+$max-width-2xl: 42rem;  // 672px
+$max-width-3xl: 48rem;  // 768px
+$max-width-4xl: 56rem;  // 896px
+$max-width-5xl: 64rem;  // 1024px
+$max-width-6xl: 72rem;  // 1152px
+$max-width-7xl: 80rem;  // 1280px
+$max-width-full: 100%;
+
+/* CONTAINER */
+$container-max-width: 1400px;
+$container-padding: clamp(16px, 3vw, 32px);

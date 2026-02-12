@@ -1,0 +1,182 @@
+@use '../../../../../styles/mixins' as *;
+
+.paciente-list-container {
+  @include container;
+  padding-top: $spacing-lg;
+  padding-bottom: $spacing-lg;
+}
+
+.paciente-list-header {
+  @include flex-center;
+  gap: $space-3;
+  margin-bottom: $space-4;
+}
+
+.paciente-list-title {
+  font-size: $font-3xl;
+  font-weight: $font-bold;
+  color: $gray-900;
+}
+
+.paciente-list-table {
+  background: $white;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-sm;
+  border: 1px solid $gray-200;
+  overflow: hidden;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+thead {
+  background: $purple-lighter;
+  border-bottom: 1px solid $purple-border;
+}
+
+th {
+  padding: $space-6 $space-4;
+  text-align: left;
+  font-size: $font-sm;
+  font-weight: $font-semibold;
+  color: $purple-dark;
+}
+
+th.acao {
+  text-align: right;
+}
+
+tbody {
+  // Divide-y
+  & > tr + tr {
+    border-top: 1px solid $gray-200;
+  }
+}
+
+tr {
+  transition: background-color $transition-base;
+  cursor: pointer;
+  &:hover {
+    background: $purple-lighter;
+  }
+}
+
+td {
+  padding: $space-6 $space-4;
+  font-size: $font-base;
+  color: $gray-900;
+  vertical-align: middle;
+}
+
+td.nome-cell {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+}
+
+.avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: $radius-full;
+  background: $purple-light;
+  color: $purple-primary;
+  font-weight: $font-bold;
+  font-size: $font-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+td.acao-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  min-height: 48px;
+  padding-right: 16px; // aumente aqui
+}
+
+.acao-link {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 32px; // ou igual ao line-height do texto
+  font-size: $font-base;
+  font-weight: $font-medium;
+  color: $purple-primary;
+  text-decoration: none;
+  transition: $transition-base;
+  svg {
+    display: inline-block;
+    vertical-align: middle;
+    margin-top: 1px; // ajuste fino se necessário
+  }
+  &:hover {
+    color: $purple-dark;
+    text-decoration: underline;
+    svg {
+      transform: translateX(2px);
+    }
+  }
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $space-1 $space-3;
+  border-radius: $radius-full;
+  font-size: $font-xs;
+  font-weight: $font-medium;
+  &.novo {
+    background: $blue-light;
+    color: $blue-dark;
+  }
+  &.aguardando_avaliacao {
+    background: $purple-light;
+    color: $purple-dark;
+  }
+  &.em_tratamento {
+    background: $green-light;
+    color: $green-dark;
+  }
+  &.finalizado {
+    background: $gray-100;
+    color: $gray-700;
+  }
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 999px;
+  text-transform: capitalize;
+}
+
+/* Status */
+.status-novo { background: #e0f2fe; color: #0369a1; }
+.status-contatado { background: #e0e7ff; color: #4338ca; }
+.status-aguardando_avaliacao { background: #f3e8ff; color: #7e22ce; }
+.status-em_tratamento { background: #dcfce7; color: #166534; }
+.status-finalizado { background: #f3f4f6; color: #374151; }
+.status-perdido { background: #fee2e2; color: #991b1b; }
+
+/* fallback */
+.status-desconhecido { background: #f3f4f6; color: #111827; }
+
+
+.paciente-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}

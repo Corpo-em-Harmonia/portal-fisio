@@ -1,86 +1,127 @@
-/* modal-cadastro.component.scss */
+:host {
+  --brand: #6f2dbd;        /* roxo principal */
+  --brand-2: #7c3aed;      /* hover */
+  --bg-soft: #faf7ff;      /* roxo bem clarinho */
+  --border: #e9d5ff;       /* lilás */
+  --text: #111827;
+  --muted: #6b7280;
+}
 
 .custom-modal {
   position: fixed;
-  top: 0; left: 0;
-  width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.6); /* fundo cinza escuro */
+  inset: 0;
+  background: rgba(17, 24, 39, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 16px;
   z-index: 9999;
 }
 
 .custom-modal-content {
+  width: 100%;
+  max-width: 560px;
   background: #fff;
-  padding: 1.5rem 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-  min-width: 500px;
-  max-width: 95vw;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 22px 22px 18px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
   position: relative;
 }
 
 .custom-modal-close {
   position: absolute;
-  top: 16px; right: 20px;
-  font-size: 2rem;
-  color: #888;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--brand);
+  font-size: 20px;
   cursor: pointer;
-  transition: color 0.2s;
-}
-.custom-modal-close:hover {
-  color: #d32f2f;
-}
-
-h2 {
-  margin-top: 0;
-  text-align: center;
-  font-size: 2rem;
-  font-weight: 600;
+  display: grid;
+  place-items: center;
+  line-height: 1;
 }
 
-p {
-  text-align: center;
-  color: #555;
-  margin-bottom: 1.5rem;
+.modal-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text);
 }
 
-form {
+.modal-desc {
+  margin: 6px 0 14px 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.modal-actions {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-button {
-  margin-top: 1.5rem;
-  width: 100%;
-  padding: 0.75rem;
-  border-radius: 30px;
-  border: none;
-  background: #6c63ff;
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
+.modal-actions-stack {
+  flex-direction: column;
+  align-items: stretch;
 }
-button:hover {
-  background: #5548c8;
+
+.modal-actions-row {
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 14px;
+}
+
+.phone-info {
+  margin: 14px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.phone-info strong {
+  color: var(--text);
+  font-weight: 700;
 }
 
 .modal-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
 }
 
 .modal-field {
   width: 100%;
 }
 
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1.5rem;
+/* ✅ Harmoniza botões Angular Material no modal */
+.custom-modal-content :is(.mat-mdc-raised-button, .mat-mdc-outlined-button, .mat-mdc-button) {
+  border-radius: 14px !important;
+  min-height: 42px;
+  font-weight: 600;
+}
+
+/* Raised primary */
+.custom-modal-content .mat-mdc-raised-button.mat-primary {
+  background: var(--brand) !important;
+}
+
+.custom-modal-content .mat-mdc-raised-button.mat-primary:hover {
+  background: var(--brand-2) !important;
+}
+
+/* Stroked */
+.custom-modal-content .mat-mdc-outlined-button.mat-primary {
+  border-color: var(--brand) !important;
+}
+
+/* Inputs outline com borda lilás suave */
+.custom-modal-content .mat-mdc-form-field-appearance-outline .mdc-notched-outline__leading,
+.custom-modal-content .mat-mdc-form-field-appearance-outline .mdc-notched-outline__notch,
+.custom-modal-content .mat-mdc-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-color: var(--border) !important;
 }

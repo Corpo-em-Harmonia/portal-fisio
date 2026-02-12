@@ -1,0 +1,171 @@
+.agenda-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.agenda-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+
+  .avatar-circle {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3e8ff;
+    color: #6d28d9;
+  }
+
+  .header-text {
+    flex: 1;
+
+    .agenda-title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .agenda-sub {
+      margin: 4px 0 0;
+      color: #6b7280;
+      font-size: 14px;
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    .date-field {
+      width: 170px;
+    }
+  }
+}
+
+.agenda-table {
+  background: #faf5ff;
+  border: 1px solid #eee2ff;
+  border-radius: 16px;
+  padding: 12px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  thead th {
+    text-align: left;
+    font-size: 13px;
+    color: #6d28d9;
+    font-weight: 700;
+    padding: 14px 16px;
+    background: #faf5ff;
+    border-bottom: 1px solid #efe6ff;
+  }
+
+  tbody td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .nome-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .avatar-circle {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #f3e8ff;
+      color: #6d28d9;
+      font-weight: 800;
+    }
+  }
+
+  .muted {
+    color: #6b7280;
+    font-size: 14px;
+  }
+
+  .acao {
+    width: 90px;
+    text-align: center;
+  }
+
+  .acao-cell {
+    text-align: center;
+  }
+
+  .empty-row {
+    text-align: center;
+    padding: 20px;
+    color: #6b7280;
+  }
+}
+
+/* Badge base */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+/* Status colors */
+.status-marcada {
+  background: #e0f2fe;
+  color: #075985;
+  border-color: #bae6fd;
+}
+
+.status-remarcada {
+  background: #ede9fe;
+  color: #5b21b6;
+  border-color: #ddd6fe;
+}
+
+.status-compareceu {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.status-faltou {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+
+.status-cancelada {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #e5e7eb;
+}
+
+.status-desconhecido {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
