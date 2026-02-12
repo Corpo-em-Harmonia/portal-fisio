@@ -38,12 +38,38 @@ export class Home {
   modalVisivel = false;
 
   modalButtons = [
-    { label: 'Enviar', action: 'criar-lead', color: 'primary' },
-    { label: 'Fechar', action: 'fechar', color: 'basic' }
+    { label: 'Chamar no WhatsApp', action: 'whatsapp', color: 'primary' },
+    { label: 'Ligar', action: 'ligar', color: 'basic' },
+    { label: 'Quero que me chamem', action: 'criar-lead', color: 'accent' },
   ];
+
+  private readonly WHATSAPP_PHONE = '5511999999999'; // coloca o número real
+  private readonly PHONE = '+5511999999999';
+
   isModalOpen = false;
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
+
+
+  abrirWhatsapp(): void {
+    const msg = encodeURIComponent('Olá! Quero agendar uma avaliação de fisioterapia.');
+    window.open(`https://wa.me/${this.WHATSAPP_PHONE}?text=${msg}`, '_blank');
+  }
+
+    ligar(): void {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        window.location.href = `tel:${this.PHONE}`;
+      } else {
+        navigator.clipboard.writeText(this.PHONE);
+        this.snackBar.open(
+          'Número copiado! Ligue pelo seu telefone.',
+          'Fechar',
+          { duration: 4000 }
+        );
+      }
+    }
 
   openModal() {
     this.isModalOpen = true;
@@ -55,16 +81,24 @@ export class Home {
 
   constructor(private leadService: LeadService,private snackBar: MatSnackBar) { }
 
-  onModalButtonClick(event: { action: string, value: any }) {
-  if (event.action === 'criar-lead') {
-      console.log('Salvar lead acionado');
+onModalButtonClick(event: { action: string; value?: any }) {
+  switch (event.action) {
+    case 'whatsapp':
+      this.abrirWhatsapp();
+      this.closeModal();
+      return;
+
+    case 'ligar':
+      this.ligar();
+      this.closeModal();
+      return;
+
+    case 'criar-lead':
       this.criarLead(event.value);
-      this.closeModal();
-    } else if (event.action === 'fechar') {
-      this.modalVisivel = false;
-      this.closeModal();
-    }
+      // criarLead já fecha e mostra snackbar
+      return;
   }
+}
 
   criarLead(formValue: any) {
     if (formValue && formValue.email) {

@@ -14,10 +14,10 @@ export const routes: Routes = [
         .then(m => m.AvaliacaoModule)
   },
   {
-    path: 'pacientes',
+    path: 'leads',
     loadChildren: () =>
-      import('./features/pacientes/pacientes-module')
-        .then(m => m.PacientesModule)
+      import('./features/leads/leads-module')
+        .then(m => m.LeadsModule)
   },
   {
     path: 'admin',
@@ -25,6 +25,12 @@ export const routes: Routes = [
       import('./features/admin/admin-module')
         .then(m => m.AdminModule)
   },
-  { path: '', redirectTo: 'pacientes', pathMatch: 'full' }
+  {
+    path: 'agenda',
+    loadChildren: () =>
+      import('./features/agenda/agenda-module')
+    .then(m => m.AgendaModule)
+  },
+  { path: '', redirectTo: 'leads', pathMatch: 'full' }
 ];
 
