@@ -1,4 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule, UpperCasePipe } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { SessaoService } from '../../../../shared/service/sessao.service';
 import { Sessao, SessaoStatus } from '../../../../shared/models/sessao';
 import {
@@ -8,10 +15,20 @@ import {
   SESSAO_STATUS_LABEL,
 } from '../../../../shared/constants/sessao-ui.constants';
 
-type SessaoAcao = 'COMPARECEU' | 'FALTOU' | 'CANCELAR' | 'REMARCAR';
+type SessaoAcao = 'COMPARECEU' | 'FALTOU' | 'MARCAR_PERDIDO' | 'REMARCAR';
 
 @Component({
   selector: 'app-agenda-sessoes',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatDividerModule,
+    MatFormFieldModule,
+    MatInputModule,
+  ],
   templateUrl: './agenda-sessoes.html',
   styleUrls: ['./agenda-sessoes.scss'],
 })
@@ -53,7 +70,7 @@ export class AgendaSessoesComponent implements OnInit {
       case 'REMARCAR':
         return s !== 'cancelada' && s !== 'compareceu';
 
-      case 'CANCELAR':
+      case 'MARCAR_PERDIDO':
         return s !== 'cancelada' && s !== 'compareceu';
 
       default:
