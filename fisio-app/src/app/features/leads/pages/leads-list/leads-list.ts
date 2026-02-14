@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy  } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { ModalCadastroComponent } from '../../../home/components/modal-cadastro/modal-cadastro.component';
+import { ModalAgendarAvaliacaoComponent } from '../../../agenda/components/modal-agendar-avaliacao/modal-agendar-avaliacao.component';
 import {
   getStatusLabel,
   getStatusClass,
@@ -18,6 +19,7 @@ import {
 @Component({
   selector: 'app-leads-list',
   standalone: true,
+   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -26,6 +28,7 @@ import {
     MatButtonModule,
     MatDividerModule,
     ModalCadastroComponent,
+    ModalAgendarAvaliacaoComponent,
   ],
   templateUrl: './leads-list.html',
   styleUrls: ['./leads-list.scss'],
@@ -34,13 +37,13 @@ export class LeadsList implements OnInit {
   leads: Lead[] = [];
   isCadastroManualOpen = false;
   isLoading = false;
-
+  leadSelecionadoParaAgendar?: Lead;
+  isAgendarModalOpen = false;
   constructor(
     private router: Router,
     private leadService: LeadService,
-    private cdr: ChangeDetectorRef,
-    private ngZone: NgZone
-  ) {}
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit(): void {
     this.carregarLeads();
@@ -48,25 +51,45 @@ export class LeadsList implements OnInit {
 
   private carregarLeads(): void {
     this.isLoading = true;
-    
+
     this.leadService.getLeads().subscribe({
       next: (leads) => {
-        this.ngZone.run(() => {
           this.leads = [...leads]; // Cria nova referência
           this.isLoading = false;
           this.cdr.markForCheck();
-        });
       },
       error: (err) => {
-        this.ngZone.run(() => {
           this.isLoading = false;
           this.handleError('Erro ao buscar leads', err);
           this.cdr.markForCheck();
-        });
       },
     });
   }
 
+  abrirModalAgendamento(lead: Lead): void {
+    this.leadSelecionadoParaAgendar = lead;
+    this.isAgendarModalOpen = true;
+  }
+
+  fecharModalAgendamento(): void {
+    this.isAgendarModalOpen = false;
+    this.leadSelecionadoParaAgendar = undefined;
+  }
+
+  onConfirmarAgendamento(payload: { dataHora: string; observacao?: string }): void {
+
+    if (!this.leadSelecionadoParaAgendar?.id) return;
+
+    this.leadService
+      .agendarAvaliacao(this.leadSelecionadoParaAgendar.id, payload)
+      .subscribe({
+        next: () => {
+          this.carregarLeads();
+          this.fecharModalAgendamento();
+        },
+        error: (err) => console.error('Erro ao agendar avaliação', err),
+      });
+  }
   private handleError(message: string, error: any): void {
     console.error(message, error);
   }
@@ -85,14 +108,14 @@ export class LeadsList implements OnInit {
     this.leadService.aplicarAcao(lead.id, acao).subscribe({
       next: (updated) => {
         this.atualizarLeadNaLista(updated);
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: (err) => this.handleError('Erro ao aplicar ação', err),
     });
   }
 
   private atualizarLeadNaLista(updated: Lead): void {
-    this.leads = this.leads.map((l) => 
+    this.leads = this.leads.map((l) =>
       String(l.id) === String(updated.id) ? updated : l
     );
   }
@@ -136,7 +159,7 @@ export class LeadsList implements OnInit {
       next: (novo) => {
         this.leads = [novo, ...this.leads];
         this.fecharCadastroManual();
-        this.cdr.detectChanges();
+        this.cdr.markForCheck();
       },
       error: (err) => this.handleError('Erro ao criar lead manual', err),
     });

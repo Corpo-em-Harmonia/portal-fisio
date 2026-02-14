@@ -43,7 +43,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let lead of leads; trackBy: trackById" (click)="onSelectLead(lead)">>
+          <tr *ngFor="let lead of leads; trackBy: trackById" (click)="onSelectLead(lead)">
             <td class="nome-cell">
               <span class="avatar-circle">{{ getInitial(lead.nome) }}</span>
               <span>{{ lead.nome }}</span>
@@ -88,38 +88,17 @@
 
               <mat-menu #menu="matMenu" xPosition="after">
                 <button mat-menu-item
-                  (click)="aplicarAcao(lead, 'REGISTRAR_CONTATO')"
-                  [disabled]="!pode('REGISTRAR_CONTATO', lead)">
-                  <mat-icon>chat</mat-icon>
-                  <span>Registrar contato</span>
-                </button>
-
-                <button mat-menu-item
-                  (click)="aplicarAcao(lead, 'AGENDAR_AVALIACAO')"
+                  (click)="abrirModalAgendamento(lead)"
                   [disabled]="!pode('AGENDAR_AVALIACAO', lead)">
                   <mat-icon>event</mat-icon>
                   <span>Agendar avaliação</span>
                 </button>
 
                 <button mat-menu-item
-                  (click)="aplicarAcao(lead, 'CONFIRMAR_COMPARECIMENTO')"
-                  [disabled]="!pode('CONFIRMAR_COMPARECIMENTO', lead)">
-                  <mat-icon>check_circle</mat-icon>
-                  <span>Confirmar comparecimento</span>
-                </button>
-
-                <button mat-menu-item
-                  (click)="aplicarAcao(lead, 'FALTOU')"
-                  [disabled]="!pode('FALTOU', lead)">
-                  <mat-icon>person_off</mat-icon>
-                  <span>Marcar faltou</span>
-                </button>
-
-                <button mat-menu-item
                   (click)="aplicarAcao(lead, 'CANCELAR')"
                   [disabled]="!pode('CANCELAR', lead)">
                   <mat-icon>cancel</mat-icon>
-                  <span>Cancelar</span>
+                  <span>Marcar como perdido</span>
                 </button>
 
                 <mat-divider></mat-divider>
@@ -151,3 +130,9 @@
   (buttonClick)="onCadastroManual($event)"
   (close)="fecharCadastroManual()">
 </app-modal-cadastro>
+
+<app-modal-agendar-avaliacao
+  [visible]="isAgendarModalOpen"
+  (close)="fecharModalAgendamento()"
+  (confirmarAgendamento)="onConfirmarAgendamento($event)">
+</app-modal-agendar-avaliacao>

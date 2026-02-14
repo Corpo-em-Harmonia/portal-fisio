@@ -1,5 +1,7 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 
 interface Agendamento {
   id: string;
@@ -25,7 +27,8 @@ interface Paciente {
   selector: 'app-admin-dashboard',
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss'],
-  standalone: false
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule]
 })
 export class AdminDashboardComponent {
   currentDate = new Date();

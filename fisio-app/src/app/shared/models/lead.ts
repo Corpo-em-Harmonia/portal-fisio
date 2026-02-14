@@ -4,11 +4,10 @@ export type LeadStatus =
   | 'agendado'
   | 'confirmado'
   | 'convertido'
-  | 'perdido'
-  | 'faltou';
+  | 'perdido';
 
 export interface Lead {
-    id?: string | number;
+    id?: string;
     nome: string;
     sobrenome: string;
     email: string;

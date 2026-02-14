@@ -13,6 +13,7 @@ import { AgendaSessoesComponent } from './pages/agenda-sessoes/agenda-sessoes';
   imports: [
     CommonModule,
     AgendaRoutingModule,
+    AgendaSessoesComponent,
     // material usado na tela
     MatIconModule,
     MatButtonModule,

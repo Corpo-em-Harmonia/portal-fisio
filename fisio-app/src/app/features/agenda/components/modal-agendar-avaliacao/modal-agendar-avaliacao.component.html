@@ -1,0 +1,32 @@
+<div class="custom-modal" *ngIf="visible">
+  <div class="custom-modal-content">
+    <button class="custom-modal-close" (click)="close.emit()">×</button>
+
+    <h2 class="modal-title">Agendar avaliação</h2>
+    <p class="modal-desc">Escolha data e horário para a avaliação.</p>
+
+    <form [formGroup]="form" (ngSubmit)="confirmar()">
+      <mat-form-field appearance="outline" class="modal-field">
+        <mat-label>Data</mat-label>
+        <input matInput type="date" formControlName="data" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="modal-field">
+        <mat-label>Hora</mat-label>
+        <input matInput type="time" formControlName="hora" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="modal-field">
+        <mat-label>Observação (opcional)</mat-label>
+        <textarea matInput rows="3" formControlName="observacao"></textarea>
+      </mat-form-field>
+
+      <div class="modal-actions modal-actions-row">
+        <button mat-button type="button" (click)="close.emit()">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+          Agendar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -7,11 +7,8 @@ import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
 export type LeadAcao =
-  | 'REGISTRAR_CONTATO'
-  | 'AGENDAR_AVALIACAO'
-  | 'CONFIRMAR_COMPARECIMENTO'
   | 'CANCELAR'
-  | 'FALTOU';
+  | 'AGENDAR_AVALIACAO';
 
 interface AplicarAcaoResponse {
     acao: LeadAcao;
@@ -79,32 +76,32 @@ export class LeadService extends BaseService<Lead> {
         );
     }
 
+    agendarAvaliacao(
+        leadId: string | number,
+        body: { dataHora: string; observacao?: string }
+    ): Observable<any> {
+        const url = `${this.getFullUrl()}/${leadId}/agendar-avaliacao`;
+        return this.http.post(url, body);
+    }
     /**
      * Verifica se uma ação pode ser executada no lead
      * Esta lógica reflete as regras de negócio
      */
     podeExecutarAcao(lead: Lead, acao: LeadAcao): boolean {
-        const status = lead.status;
+    const status = lead.status;
 
-        switch (acao) {
-            case 'REGISTRAR_CONTATO':
-                return status === 'novo';
+    switch (acao) {
+        case 'AGENDAR_AVALIACAO':
+        // Só pode agendar se o lead está NOVO
+        return status === 'novo';
 
-            case 'AGENDAR_AVALIACAO':
-                return status === 'contatado';
+        case 'CANCELAR':
+        // pode “cancelar” em qualquer estado, menos se já estiver perdido/convertido
+        return status !== 'perdido' && status !== 'convertido';
 
-            case 'CONFIRMAR_COMPARECIMENTO':
-                return status === 'agendado';
-
-            case 'FALTOU':
-                return status === 'agendado';
-
-            case 'CANCELAR':
-                return status !== 'convertido' && status !== 'perdido';
-
-            default:
-                return false;
-        }
+        default:
+        return false;
+    }
     }
 
     /**
@@ -124,9 +121,9 @@ export class LeadService extends BaseService<Lead> {
      */
     private normalizeStatus(value: unknown): LeadStatus {
         if (!value) return 'novo';
-        
+
         const s = String(value).toLowerCase().trim();
-        
+
         // Mapeamento de valores da API para o modelo
         const statusMap: Record<string, LeadStatus> = {
             'novo': 'novo',
@@ -135,13 +132,12 @@ export class LeadService extends BaseService<Lead> {
             'confirmado': 'confirmado',
             'convertido': 'convertido',
             'perdido': 'perdido',
-            'faltou': 'faltou',
             // Possíveis variações da API
             'aguardando_avaliacao': 'agendado',
             'em_tratamento': 'convertido',
             'cancelado': 'perdido',
         };
-        
+
         return statusMap[s] || 'novo';
     }
 }

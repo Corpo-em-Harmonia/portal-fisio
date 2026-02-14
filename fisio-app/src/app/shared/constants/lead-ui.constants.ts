@@ -8,7 +8,6 @@ export const LEAD_STATUS_LABEL: Record<LeadStatus, string> = {
   confirmado: 'Confirmado',
   convertido: 'Convertido',
   perdido: 'Perdido',
-  faltou: 'Faltou',
 };
 
 // Classe CSS da badge (você vai criar no SCSS: .status-novo, .status-contatado, etc)
@@ -19,7 +18,6 @@ export const LEAD_STATUS_BADGE_CLASS: Record<LeadStatus, string> = {
   confirmado: 'status-confirmado',
   convertido: 'status-convertido',
   perdido: 'status-perdido',
-  faltou: 'status-faltou',
 };
 
 // Fallback caso venha algo inesperado
