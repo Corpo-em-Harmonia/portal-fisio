@@ -7,7 +7,7 @@ describe('AdminDashboardComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ AdminDashboardComponent ]
+      imports: [AdminDashboardComponent]
     })
     .compileComponents();
   });
