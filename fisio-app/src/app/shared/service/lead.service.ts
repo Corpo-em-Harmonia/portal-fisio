@@ -28,10 +28,8 @@ export class LeadService extends BaseService<Lead> {
     /**
      * Obtém todos os leads
      */
-    getLeads(): Observable<Lead[]> {
-        return this.getAll().pipe(
-            map(leads => leads.map(lead => this.normalizeLead(lead)))
-        );
+    getLeadsAtivos(): Observable<Lead[]> {
+    return this.http.get<Lead[]>('/api/leads', { params: { ativos: 'true' } });
     }
 
     /**

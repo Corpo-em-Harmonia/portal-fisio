@@ -11,6 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 type ModalStep = 'opcoes' | 'form';
 
@@ -22,7 +23,8 @@ type ModalStep = 'opcoes' | 'form';
     MatFormFieldModule,
     MatInputModule,
     ReactiveFormsModule,
-    MatButtonModule
+    MatButtonModule,
+    MatCheckboxModule
   ],
   templateUrl: './modal-cadastro.component.html',
   styleUrls: ['./modal-cadastro.component.scss']
@@ -38,7 +40,7 @@ export class ModalCadastroComponent implements OnChanges {
   @Input() descricao = 'Como prefere falar com a gente?';
 
   @Output() close = new EventEmitter<void>();
-  @Output() buttonClick = new EventEmitter<{ action: string; value?: any }>();
+  @Output() buttonClick = new EventEmitter<{ action: string; value?: any; agendarAgora?: boolean }>();
 
   step: ModalStep = 'opcoes';
 
@@ -47,7 +49,7 @@ export class ModalCadastroComponent implements OnChanges {
     nome: new FormControl('', Validators.required),
     sobrenome: new FormControl(''),
     telefone: new FormControl('', Validators.required),
-    email: new FormControl('', [Validators.email]),
+    email: new FormControl('', [Validators.email]),    observacao: new FormControl(''),    agendarAgora: new FormControl<boolean>(true), 
   });
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -75,15 +77,18 @@ export class ModalCadastroComponent implements OnChanges {
     this.buttonClick.emit({ action });
   }
 
-  enviar(): void {
+  cadastrar(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
+    const { agendarAgora, ...value } = this.form.getRawValue();
+
     this.buttonClick.emit({
       action: 'criar-lead',
-      value: this.form.getRawValue()
+      value,
+      agendarAgora: !!agendarAgora,
     });
   }
 }

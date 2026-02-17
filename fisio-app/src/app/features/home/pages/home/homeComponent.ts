@@ -7,12 +7,12 @@ import { RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { ModalCadastroComponent } from '../../components/modal-cadastro/modal-cadastro.component';
 import { LeadService } from '../../../../shared/service/lead.service';
 import { Lead } from '../../../../shared/models/lead';
 import { Input, Output, EventEmitter } from '@angular/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ModalContatoComponent } from '../../modal-contato/modal-contato.component';
 
 @Component({
   selector: 'app-home',
@@ -25,7 +25,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatInputModule,
     MatFormFieldModule,
     ReactiveFormsModule,
-    ModalCadastroComponent,
+    ModalContatoComponent,
     MatSnackBarModule,
   ],
   templateUrl: './homeComponent.html',
@@ -95,10 +95,10 @@ onModalButtonClick(event: { action: string; value?: any }) {
 
     case 'criar-lead':
       this.criarLead(event.value);
-      // criarLead já fecha e mostra snackbar
       return;
   }
 }
+
 
   criarLead(formValue: any) {
     if (formValue && formValue.email) {

@@ -15,7 +15,7 @@ import {
   SESSAO_STATUS_LABEL,
 } from '../../../../shared/constants/sessao-ui.constants';
 
-type SessaoAcao = 'COMPARECEU' | 'FALTOU' | 'MARCAR_PERDIDO' | 'REMARCAR';
+type SessaoAcao = 'COMPARECEU' | 'FALTOU' | 'CANCELAR' | 'REMARCAR';
 
 @Component({
   selector: 'app-agenda-sessoes',
@@ -70,7 +70,7 @@ export class AgendaSessoesComponent implements OnInit {
       case 'REMARCAR':
         return s !== 'cancelada' && s !== 'compareceu';
 
-      case 'MARCAR_PERDIDO':
+      case 'CANCELAR':
         return s !== 'cancelada' && s !== 'compareceu';
 
       default:

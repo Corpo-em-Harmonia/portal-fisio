@@ -9,11 +9,11 @@ export type LeadStatus =
 export interface Lead {
     id?: string;
     nome: string;
-    sobrenome: string;
-    email: string;
+    sobrenome?: string;
+    email?: string;
     telefone?: string;
-    motivo: string;
-    criadoEm: string;
+    observacao?: string;
+    criadoEm?: string;
     status: LeadStatus;
 }
 

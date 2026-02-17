@@ -133,6 +133,7 @@
 
 <app-modal-agendar-avaliacao
   [visible]="isAgendarModalOpen"
+  [lead]="leadSelecionadoParaAgendar"
   (close)="fecharModalAgendamento()"
   (confirmarAgendamento)="onConfirmarAgendamento($event)">
 </app-modal-agendar-avaliacao>

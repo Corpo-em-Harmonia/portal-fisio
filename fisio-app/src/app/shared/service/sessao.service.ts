@@ -1,33 +1,34 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Sessao } from '../models/sessao';
 
 @Injectable({ providedIn: 'root' })
 export class SessaoService {
-  private baseUrl = 'http://localhost:8080/api/sessoes'; // ajuste
+  private readonly baseUrl = '/api/sessoes';
 
   constructor(private http: HttpClient) {}
 
-  listarPorDia(date: string): Observable<Sessao[]> {
-    const params = new HttpParams().set('date', date);
-    return this.http.get<Sessao[]>(this.baseUrl, { params });
+  listarPorDia(dateISO: string): Observable<Sessao[]> {
+    return this.http.get<Sessao[]>(`${this.baseUrl}?date=${dateISO}`);
   }
 
   marcarCompareceu(id: string): Observable<Sessao> {
-    return this.http.post<Sessao>(`${this.baseUrl}/${id}/compareceu`, {});
+    return this.http.patch<Sessao>(`${this.baseUrl}/${id}/compareceu`, {});
   }
 
   marcarFaltou(id: string): Observable<Sessao> {
-    return this.http.post<Sessao>(`${this.baseUrl}/${id}/faltou`, {});
+    return this.http.patch<Sessao>(`${this.baseUrl}/${id}/faltou`, {});
   }
 
   cancelar(id: string): Observable<Sessao> {
-    return this.http.post<Sessao>(`${this.baseUrl}/${id}/cancelar`, {});
+    return this.http.patch<Sessao>(`${this.baseUrl}/${id}/cancelar`, {});
   }
 
-  remarcar(id: string, novaDataHoraIso: string): Observable<Sessao> {
-    const params = new HttpParams().set('novaDataHoraIso', novaDataHoraIso);
-    return this.http.post<Sessao>(`${this.baseUrl}/${id}/remarcar`, {}, { params });
+  remarcar(id: string, novaDataHoraISO: string): Observable<Sessao> {
+    // backend espera Instant, ex: 2026-02-14T14:00:00.000Z
+    return this.http.patch<Sessao>(`${this.baseUrl}/${id}/remarcar`, {
+      dataHora: novaDataHoraISO,
+    });
   }
 }

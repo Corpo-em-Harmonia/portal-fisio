@@ -79,9 +79,9 @@
 
                 <mat-divider></mat-divider>
 
-                <button mat-menu-item (click)="aplicarAcao(s, 'MARCAR_PERDIDO')" [disabled]="!pode('MARCAR_PERDIDO', s)">
+                <button mat-menu-item (click)="aplicarAcao(s, 'CANCELAR')" [disabled]="!pode('CANCELAR', s)">
                   <mat-icon>cancel</mat-icon>
-                  <span>Marcar como perdido</span>
+                  <span>Cancelar sessão</span>
                 </button>
               </mat-menu>
             </td>

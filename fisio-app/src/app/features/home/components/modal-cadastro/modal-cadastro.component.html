@@ -1,79 +1,47 @@
 <div class="custom-modal" *ngIf="visible">
-  <div class="custom-modal-content" role="dialog" aria-modal="true">
-    <button class="custom-modal-close" (click)="fechar()" aria-label="Fechar">×</button>
+  <div class="custom-modal-content">
+    <button class="custom-modal-close" (click)="fechar()">×</button>
 
     <h2 class="modal-title">{{ titulo }}</h2>
+    <p class="modal-desc">{{ descricao }}</p>
 
-    <!-- STEP 1: Opções (SÓ NO MODO PÚBLICO) -->
-    <ng-container *ngIf="step === 'opcoes' && !modoInterno">
-      <p class="modal-desc">{{ descricao }}</p>
+    <form [formGroup]="form" (ngSubmit)="cadastrar()">
+      <mat-form-field appearance="outline" class="modal-field">
+        <mat-label>Nome</mat-label>
+        <input matInput formControlName="nome" />
+      </mat-form-field>
 
-      <div class="modal-actions modal-actions-stack">
-        <button mat-raised-button color="primary" type="button" (click)="acionar('whatsapp')">
-          Chamar no WhatsApp
-        </button>
+      <mat-form-field appearance="outline" class="modal-field">
+        <mat-label>Sobrenome</mat-label>
+        <input matInput formControlName="sobrenome" />
+      </mat-form-field>
 
-        <button mat-stroked-button color="primary" type="button" (click)="acionar('ligar')">
-          Ligar
-        </button>
+      <mat-form-field appearance="outline" class="modal-field">
+        <mat-label>Telefone</mat-label>
+        <input matInput formControlName="telefone" />
+      </mat-form-field>
 
-        <!-- ✅ agora vira botão (não texto solto) -->
-        <button mat-stroked-button color="primary" type="button" (click)="irParaFormulario()">
-          Quero que me chamem
+      <mat-form-field appearance="outline" class="modal-field">
+        <mat-label>Email (opcional)</mat-label>
+        <input matInput formControlName="email" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="modal-field">
+        <mat-label>Observação (opcional)</mat-label>
+        <textarea matInput rows="3" formControlName="observacao"></textarea>
+      </mat-form-field>
+
+      <!-- ✅ Opção -->
+      <mat-checkbox formControlName="agendarAgora">
+        Agendar avaliação agora
+      </mat-checkbox>
+
+      <div class="modal-actions modal-actions-row">
+        <button mat-button type="button" (click)="fechar()">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit">
+          Salvar
         </button>
       </div>
-
-      <p class="phone-info">
-        Ou ligue: <strong>(11) 95279-0078</strong>
-      </p>
-    </ng-container>
-
-    <!-- STEP 2: Form (PÚBLICO E INTERNO) -->
-    <ng-container *ngIf="step === 'form'">
-      <p class="modal-desc">
-        {{ modoInterno ? 'Cadastre manualmente um novo contato.' : 'Deixe seus dados que a recepção entra em contato.' }}
-      </p>
-
-      <form [formGroup]="form" class="modal-form" (ngSubmit)="enviar()">
-        <mat-form-field class="modal-field" appearance="outline">
-          <mat-label>Nome</mat-label>
-          <input matInput formControlName="nome" placeholder="Seu nome" />
-          <mat-error *ngIf="form.controls.nome.touched && form.controls.nome.hasError('required')">
-            Nome é obrigatório
-          </mat-error>
-        </mat-form-field>
-
-        <!-- opcional -->
-        <mat-form-field class="modal-field" appearance="outline">
-          <mat-label>Sobrenome (opcional)</mat-label>
-          <input matInput formControlName="sobrenome" placeholder="Seu sobrenome" />
-        </mat-form-field>
-
-        <mat-form-field class="modal-field" appearance="outline">
-          <mat-label>Telefone</mat-label>
-          <input matInput formControlName="telefone" placeholder="(11) 99999-9999" />
-          <mat-error *ngIf="form.controls.telefone.touched && form.controls.telefone.hasError('required')">
-            Telefone é obrigatório
-          </mat-error>
-        </mat-form-field>
-
-        <mat-form-field class="modal-field" appearance="outline">
-          <mat-label>Email (opcional)</mat-label>
-          <input matInput type="email" formControlName="email" placeholder="seuemail@exemplo.com" />
-          <mat-error *ngIf="form.controls.email.touched && form.controls.email.hasError('email')">
-            Email inválido
-          </mat-error>
-        </mat-form-field>
-
-        <div class="modal-actions modal-actions-row">
-          <!-- Voltar só no público -->
-          <button *ngIf="!modoInterno" mat-button type="button" (click)="voltar()">Voltar</button>
-
-          <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
-            {{ modoInterno ? 'Cadastrar' : 'Enviar' }}
-          </button>
-        </div>
-      </form>
-    </ng-container>
+    </form>
   </div>
 </div>

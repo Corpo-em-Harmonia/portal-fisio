@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { ActivatedRoute } from '@angular/router';
 import { AvaliacaoForm } from './avaliacao-form';
 
 describe('AvaliacaoForm', () => {
@@ -8,9 +8,10 @@ describe('AvaliacaoForm', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AvaliacaoForm]
+      imports: [AvaliacaoForm],
+      providers: [{ provide: ActivatedRoute, useValue: { snapshot: { queryParams: {} } } }]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(AvaliacaoForm);
     component = fixture.componentInstance;
