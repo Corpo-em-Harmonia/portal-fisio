@@ -4,3 +4,5 @@
  */
 
 export * from './lead.service';
+export * from './agendamento.service';
+export * from './sessao.service';

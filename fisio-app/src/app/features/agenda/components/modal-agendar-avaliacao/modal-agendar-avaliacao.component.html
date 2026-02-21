@@ -1,29 +1,61 @@
 <div class="custom-modal" *ngIf="visible">
   <div class="custom-modal-content">
-    <button class="custom-modal-close" (click)="close.emit()">×</button>
+    <button class="custom-modal-close" (click)="fechar()">×</button>
 
     <h2 class="modal-title">Agendar avaliação</h2>
     <p class="modal-desc">Escolha data e horário para a avaliação.</p>
 
+    <!-- opcional: mostrar o lead -->
+    <div *ngIf="lead" class="lead-resumo">
+      <div class="lead-info">
+        <strong class="lead-nome">{{ getNomeCompleto() }}</strong>
+        <span class="lead-telefone" *ngIf="lead.telefone">{{ lead.telefone }}</span>
+      </div>
+    </div>
+
     <form [formGroup]="form" (ngSubmit)="confirmar()">
       <mat-form-field appearance="outline" class="modal-field">
         <mat-label>Data</mat-label>
-        <input matInput type="date" formControlName="data" />
+        <input matInput [matDatepicker]="picker" formControlName="data" [min]="minDate" placeholder="Selecione a data">
+        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
 
-      <mat-form-field appearance="outline" class="modal-field">
-        <mat-label>Hora</mat-label>
-        <input matInput type="time" formControlName="hora" />
-      </mat-form-field>
+      <div class="horarios-section" *ngIf="form.get('data')?.value">
+        <label class="horarios-label">Horário *</label>
+
+        <div *ngIf="carregandoHorarios" class="loading-horarios">
+          Carregando horários disponíveis...
+        </div>
+
+        <div *ngIf="!carregandoHorarios && horariosDisponiveis.length === 0" class="no-horarios">
+          Nenhum horário disponível para esta data.
+        </div>
+
+        <div *ngIf="!carregandoHorarios && horariosDisponiveis.length > 0" class="horarios-grid">
+          <button
+            *ngFor="let horario of horariosDisponiveis"
+            type="button"
+            class="horario-btn"
+            [class.selected]="horarioSelecionado === horario.time"
+            [class.unavailable]="!horario.available"
+            [disabled]="!horario.available"
+            (click)="selecionarHorario(horario)">
+            {{ horario.time }}
+            <span *ngIf="!horario.available" class="ocupado-badge">Ocupado</span>
+          </button>
+        </div>
+      </div>
 
       <mat-form-field appearance="outline" class="modal-field">
         <mat-label>Observação (opcional)</mat-label>
-        <textarea matInput rows="3" formControlName="observacao"></textarea>
+        <textarea matInput rows="3" formControlName="observacao"
+          placeholder="Ex: Primeira avaliação, dor lombar..."></textarea>
       </mat-form-field>
 
       <div class="modal-actions modal-actions-row">
-        <button mat-button type="button" (click)="close.emit()">Cancelar</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+        <button mat-button type="button" (click)="fechar()">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!isFormValido()">
           Agendar
         </button>
       </div>

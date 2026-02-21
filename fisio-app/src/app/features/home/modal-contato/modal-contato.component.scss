@@ -1,0 +1,199 @@
+:host {
+  --brand: #6f2dbd;        /* roxo principal */
+  --brand-2: #7c3aed;      /* hover */
+  --bg-soft: #faf7ff;      /* roxo bem clarinho */
+  --border: #e9d5ff;       /* lilás */
+  --text: #111827;
+  --muted: #6b7280;
+}
+
+.custom-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.4);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  z-index: 9999;
+}
+
+.custom-modal-content {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 32px;
+  box-shadow: 0 20px 70px rgba(111, 45, 189, 0.15);
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.custom-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+  color: var(--brand);
+  font-size: 22px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--brand);
+    color: white;
+    border-color: var(--brand);
+  }
+}
+
+.modal-title {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.modal-desc {
+  margin: 0 0 24px 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 28px;
+
+  button {
+    width: 100%;
+    height: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0.3px;
+    border-radius: 12px !important;
+
+    &.mat-mdc-raised-button {
+      box-shadow: 0 4px 12px rgba(111, 45, 189, 0.25) !important;
+      
+      &:hover {
+        box-shadow: 0 6px 16px rgba(111, 45, 189, 0.35) !important;
+      }
+    }
+  }
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+  margin: 32px 0 28px 0;
+  position: relative;
+
+  &::after {
+    content: 'ou';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 0 16px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.mini-title {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.modal-field {
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.modal-actions-row {
+  justify-content: flex-end;
+
+  button {
+    min-width: 100px;
+    border-radius: 12px !important;
+    font-weight: 600;
+  }
+}
+
+/* Harmoniza botões Angular Material */
+.custom-modal-content :is(.mat-mdc-raised-button, .mat-mdc-outlined-button, .mat-mdc-button) {
+  border-radius: 12px !important;
+  font-weight: 600;
+}
+
+.custom-modal-content .mat-mdc-raised-button.mat-primary {
+  background: var(--brand) !important;
+  
+  &:hover {
+    background: var(--brand-2) !important;
+  }
+}
+
+.custom-modal-content .mat-mdc-raised-button.mat-accent {
+  background: #ec4899 !important;
+  
+  &:hover {
+    background: #db2777 !important;
+  }
+}
+
+/* Inputs com borda lilás */
+.custom-modal-content .mat-mdc-form-field-appearance-outline .mdc-notched-outline__leading,
+.custom-modal-content .mat-mdc-form-field-appearance-outline .mdc-notched-outline__notch,
+.custom-modal-content .mat-mdc-form-field-appearance-outline .mdc-notched-outline__trailing {
+  border-color: var(--border) !important;
+}
+
+.custom-modal-content .mat-mdc-form-field-appearance-outline.mat-focused .mdc-notched-outline__leading,
+.custom-modal-content .mat-mdc-form-field-appearance-outline.mat-focused .mdc-notched-outline__notch,
+.custom-modal-content .mat-mdc-form-field-appearance-outline.mat-focused .mdc-notched-outline__trailing {
+  border-color: var(--brand) !important;
+  border-width: 2px !important;
+}
+
+// Responsivo
+@media (max-width: 600px) {
+  .custom-modal-content {
+    padding: 24px;
+    width: 95%;
+  }
+
+  .modal-title {
+    font-size: 24px;
+  }
+
+  .actions button {
+    height: 48px;
+  }
+}

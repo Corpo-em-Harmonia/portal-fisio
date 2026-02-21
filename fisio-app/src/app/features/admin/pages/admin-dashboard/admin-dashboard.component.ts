@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
 
 interface Agendamento {
   id: string;
@@ -28,7 +30,7 @@ interface Paciente {
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule]
+  imports: [CommonModule, FormsModule, RouterModule, MatSnackBarModule]
 })
 export class AdminDashboardComponent {
   currentDate = new Date();
@@ -54,7 +56,7 @@ export class AdminDashboardComponent {
 
   years: number[] = [];
 
-  constructor(private router: Router) {
+  constructor(private router: Router, private snackBar: MatSnackBar) {
     const currentYear = new Date().getFullYear();
     for (let i = currentYear - 5; i <= currentYear + 2; i++) {
       this.years.push(i);
@@ -190,8 +192,10 @@ export class AdminDashboardComponent {
   }
 
   novoAgendamento(): void {
-    // Implementar lógica de novo agendamento
-    console.log('Novo agendamento');
+    // TODO: implementar lógica de novo agendamento
+    this.snackBar.open('Funcionalidade de agendamento em desenvolvimento', 'Fechar', {
+      duration: 3000
+    });
   }
 
   getCurrentMonth(): number {

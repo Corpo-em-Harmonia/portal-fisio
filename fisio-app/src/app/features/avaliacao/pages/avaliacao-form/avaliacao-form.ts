@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 interface UploadedFile {
   name: string;
@@ -13,7 +14,7 @@ interface UploadedFile {
 @Component({
   selector: 'app-avaliacao-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatSnackBarModule],
   templateUrl: './avaliacao-form.html',
   styleUrls: ['./avaliacao-form.scss']
 })
@@ -35,7 +36,8 @@ export class AvaliacaoForm implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -177,15 +179,19 @@ export class AvaliacaoForm implements OnInit {
         observacoes: formValue.observacoes
       };
 
-      console.log('Dados para submeter:', dataToSubmit);
-      
-      // Aqui você faria a chamada ao serviço para salvar
+      // TODO: implementar chamada ao serviço para salvar
       // this.avaliacaoService.salvar(dataToSubmit).subscribe(...)
       
-      alert('Avaliação salva com sucesso!');
+      this.snackBar.open('Avaliação salva com sucesso!', 'Fechar', {
+        duration: 4000,
+        panelClass: ['success-snackbar']
+      });
       this.router.navigate(['/']);
     } else {
-      alert('Por favor, preencha todos os campos obrigatórios');
+      this.snackBar.open('Por favor, preencha todos os campos obrigatórios', 'Fechar', {
+        duration: 4000,
+        panelClass: ['error-snackbar']
+      });
       this.markFormGroupTouched(this.avaliacaoForm);
     }
   }

@@ -18,10 +18,10 @@
 </div>
 
 <!-- Modal -->
-<app-modal-cadastro
+<app-modal-contato
   [visible]="isModalOpen"
-  (buttonClick)="onModalButtonClick($event)"
+  (action)="onModalButtonClick($event)"
   (close)="closeModal()">
-</app-modal-cadastro>
+</app-modal-contato>
 
 <!-- ...existing code... -->    

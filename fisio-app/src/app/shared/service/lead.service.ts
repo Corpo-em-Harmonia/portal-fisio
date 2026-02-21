@@ -10,11 +10,6 @@ export type LeadAcao =
   | 'CANCELAR'
   | 'AGENDAR_AVALIACAO';
 
-interface AplicarAcaoResponse {
-    acao: LeadAcao;
-    lead: Lead;
-}
-
 @Injectable({
     providedIn: 'root'
 })
@@ -28,10 +23,8 @@ export class LeadService extends BaseService<Lead> {
     /**
      * Obtém todos os leads
      */
-    getLeads(): Observable<Lead[]> {
-        return this.getAll().pipe(
-            map(leads => leads.map(lead => this.normalizeLead(lead)))
-        );
+    getLeadsAtivos(): Observable<Lead[]> {
+    return this.http.get<Lead[]>('/api/leads', { params: { ativos: 'true' } });
     }
 
     /**
@@ -140,4 +133,9 @@ export class LeadService extends BaseService<Lead> {
 
         return statusMap[s] || 'novo';
     }
+
+      
+  excluir(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.getFullUrl()}/${id}`);
+  }
 }
