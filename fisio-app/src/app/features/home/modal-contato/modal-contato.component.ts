@@ -1,9 +1,10 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { ModalLeadHelper, ModalActionEvent } from '../../../shared/helpers/modal-lead.helper';
 
 @Component({
   selector: 'app-modal-contato',
@@ -16,14 +17,13 @@ export class ModalContatoComponent {
   @Input() visible = false;
 
   @Output() close = new EventEmitter<void>();
-  @Output() action = new EventEmitter<{ action: 'whatsapp' | 'ligar' | 'criar-lead'; value?: any }>();
+  @Output() action = new EventEmitter<ModalActionEvent>();
 
-  form = new FormGroup({
-    nome: new FormControl<string>('', Validators.required),
-    sobrenome: new FormControl<string>('',Validators.required),
-    telefone: new FormControl<string>('', Validators.required),
-    email: new FormControl<string>('', [Validators.required, Validators.email]),
-  });
+  form: FormGroup;
+
+  constructor() {
+    this.form = ModalLeadHelper.createLeadForm();
+  }
 
   clicarWhatsApp(): void {
     this.action.emit({ action: 'whatsapp' });
@@ -34,15 +34,14 @@ export class ModalContatoComponent {
   }
 
   enviarContato(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (!ModalLeadHelper.validateAndMarkTouched(this.form)) {
       return;
     }
     this.action.emit({ action: 'criar-lead', value: this.form.getRawValue() });
   }
 
   fechar(): void {
-    this.form.reset();
+    ModalLeadHelper.resetForm(this.form);
     this.close.emit();
   }
 }

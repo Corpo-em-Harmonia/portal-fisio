@@ -13,6 +13,7 @@ import { Input, Output, EventEmitter } from '@angular/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ModalContatoComponent } from '../../modal-contato/modal-contato.component';
+import { ModalActionEvent } from '../../../../shared/helpers/modal-lead.helper';
 
 @Component({
   selector: 'app-home',
@@ -28,10 +29,10 @@ import { ModalContatoComponent } from '../../modal-contato/modal-contato.compone
     ModalContatoComponent,
     MatSnackBarModule,
   ],
-  templateUrl: './homeComponent.html',
-  styleUrls: ['./homeComponent.scss'],
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
 })
-export class Home {
+export class HomeComponent {
   @ViewChild(MatMenuTrigger) trigger!: MatMenuTrigger;
 
   @Output() buttonClick = new EventEmitter<string>();
@@ -81,7 +82,7 @@ export class Home {
 
   constructor(private leadService: LeadService,private snackBar: MatSnackBar) { }
 
-onModalButtonClick(event: { action: string; value?: any }) {
+onModalButtonClick(event: ModalActionEvent) {
   switch (event.action) {
     case 'whatsapp':
       this.abrirWhatsapp();

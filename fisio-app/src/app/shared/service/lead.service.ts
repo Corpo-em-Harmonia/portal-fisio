@@ -10,11 +10,6 @@ export type LeadAcao =
   | 'CANCELAR'
   | 'AGENDAR_AVALIACAO';
 
-interface AplicarAcaoResponse {
-    acao: LeadAcao;
-    lead: Lead;
-}
-
 @Injectable({
     providedIn: 'root'
 })
@@ -138,4 +133,9 @@ export class LeadService extends BaseService<Lead> {
 
         return statusMap[s] || 'novo';
     }
+
+      
+  excluir(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.getFullUrl()}/${id}`);
+  }
 }

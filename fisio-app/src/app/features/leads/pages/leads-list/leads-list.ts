@@ -160,6 +160,19 @@ export class LeadsList implements OnInit {
     this.isCadastroManualOpen = false;
   }
 
+  excluirLead(lead: Lead): void {
+    if (!lead.id) return; 
+    if (!confirm(`Tem certeza que deseja excluir o lead "${LeadHelper.getNomeCompleto(lead)}"?`)) return;
+
+    this.leadService.excluir(lead.id).subscribe({
+      next: () => {
+        this.leads = this.leads.filter(l => l.id !== lead.id);
+        this.cdr.markForCheck();
+      },
+      error: (err) => this.handleError('Erro ao excluir lead', err),
+    });
+  }
+
 
 onCadastroManual(event: { action: 'criar-lead' | string; value?: Partial<Lead>; agendarAgora?: boolean }): void {
   if (event.action !== 'criar-lead' || !event.value) return;

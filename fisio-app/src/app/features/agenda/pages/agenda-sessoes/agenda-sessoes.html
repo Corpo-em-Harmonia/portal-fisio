@@ -1,4 +1,5 @@
 <div class="agenda-container">
+  <!-- Header com título e estatísticas -->
   <div class="agenda-header">
     <div class="avatar-circle">
       <mat-icon>event</mat-icon>
@@ -6,22 +7,85 @@
 
     <div class="header-text">
       <h1 class="agenda-title">Agenda - Sessões (Recepção)</h1>
-      <p class="agenda-sub">Marque comparecimento, faltas e remarcações</p>
-    </div>
-
-    <div class="header-actions">
-      <mat-form-field appearance="outline" class="date-field">
-        <mat-label>Dia</mat-label>
-        <input matInput type="date" [value]="selectedDate" (change)="onDateChange($any($event.target).value)" />
-      </mat-form-field>
-
-      <button mat-stroked-button color="primary" type="button" (click)="carregar()">
-        <mat-icon>refresh</mat-icon>
-        Atualizar
-      </button>
+      <p class="agenda-sub">Gerencie presença, faltas e remarcações</p>
     </div>
   </div>
 
+  <!-- Estatísticas em cards -->
+  <div class="stats-container">
+    <div class="stat-card stat-hoje">
+      <mat-icon>today</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ estatisticas.hoje }}</span>
+        <span class="stat-label">Hoje</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-pendentes">
+      <mat-icon>schedule</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ estatisticas.pendentes }}</span>
+        <span class="stat-label">Pendentes</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-compareceu">
+      <mat-icon>check_circle</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ estatisticas.comparecidas }}</span>
+        <span class="stat-label">Compareceu</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-faltou">
+      <mat-icon>person_off</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ estatisticas.faltas }}</span>
+        <span class="stat-label">Faltas</span>
+      </div>
+    </div>
+
+    <div class="stat-card stat-total">
+      <mat-icon>assessment</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ estatisticas.total }}</span>
+        <span class="stat-label">Total</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters-container">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Período</mat-label>
+      <mat-select [(ngModel)]="selectedPeriodo" (selectionChange)="onPeriodoChange($event.value)">
+        <mat-option *ngFor="let p of periodos" [value]="p.value">
+          {{ p.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field" *ngIf="selectedPeriodo === 'custom'">
+      <mat-label>Data</mat-label>
+      <input matInput type="date" [(ngModel)]="selectedDate" (change)="onDateChange($any($event.target).value)" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Status</mat-label>
+      <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusChange($event.value)">
+        <mat-option *ngFor="let s of statusOptions" [value]="s.value">
+          {{ s.label }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="button" (click)="carregar()">
+      <mat-icon>refresh</mat-icon>
+      Atualizar
+    </button>
+  </div>
+
+  <!-- Tabela de sessões -->
   <div class="agenda-table">
     <div style="overflow-x:auto;">
       <table>
@@ -29,17 +93,19 @@
           <tr>
             <th>Paciente</th>
             <th>Telefone</th>
-            <th>Data/Hora</th>
+            <th>Data</th>
+            <th>Horário</th>
             <th>Status</th>
+            <th>Tipo</th>
             <th class="acao">Ação</th>
           </tr>
         </thead>
 
         <tbody>
-          <tr *ngFor="let s of sessoes">
+          <tr *ngFor="let s of sessoes" [ngClass]="getTipoClass(s.tipo)">
             <td class="nome-cell">
               <span class="avatar-circle">{{ (s.pacienteNome?.charAt(0) || 'P') | uppercase }}</span>
-              <span>{{ s.pacienteNome || s.pacienteId }}</span>
+              <span class="nome-text">{{ s.pacienteNome || s.pacienteId }}</span>
             </td>
 
             <td>
@@ -47,13 +113,34 @@
             </td>
 
             <td>
-              <span class="muted">{{ formatDateTime(s.dataHora) }}</span>
+              <span class="muted">{{ formatDate(s.dataHora) }}</span>
+            </td>
+
+            <td>
+              <span class="time-text">{{ formatTime(s.dataHora) }}</span>
             </td>
 
             <td>
               <span class="status-badge" [ngClass]="getStatusClass(s.status)">
+                <mat-icon *ngIf="s.status === 'aguardando_avaliacao'" class="status-icon">hourglass_empty</mat-icon>
                 {{ getStatusLabel(s.status) }}
               </span>
+            </td>
+
+            <td>
+              <div class="tipo-badges">
+                <mat-chip *ngIf="s.tipo" [ngClass]="getTipoClass(s.tipo)" class="tipo-chip">
+                  {{ getTipoLabel(s.tipo) }}
+                </mat-chip>
+                <mat-chip *ngIf="s.tipoSessao === 'avaliacao'" class="tipo-avaliacao">
+                  <mat-icon>assignment</mat-icon>
+                  AVALIAÇÃO
+                </mat-chip>
+                <span *ngIf="s.totalFaltas && s.totalFaltas > 0" 
+                      [class]="s.totalFaltas >= 2 ? 'badge-faltas-critico' : 'badge-faltas'">
+                  {{ s.totalFaltas }} {{ s.totalFaltas === 1 ? 'falta' : 'faltas' }}
+                </span>
+              </div>
             </td>
 
             <td class="acao-cell" (click)="$event.stopPropagation()">
@@ -62,38 +149,88 @@
               </button>
 
               <mat-menu #menu="matMenu" xPosition="after">
-                <button mat-menu-item (click)="aplicarAcao(s, 'COMPARECEU')" [disabled]="!pode('COMPARECEU', s)">
-                  <mat-icon>check_circle</mat-icon>
-                  <span>Marcar compareceu</span>
-                </button>
+                <!-- Menu para AVALIAÇÕES -->
+                <ng-container *ngIf="isAvaliacao(s)">
+                  <button mat-menu-item 
+                          (click)="marcarCompareceuAvaliacao(s)" 
+                          [disabled]="!pode('COMPARECEU', s) || s.status === 'aguardando_avaliacao' || s.status === 'avaliada'">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Paciente compareceu</span>
+                  </button>
 
-                <button mat-menu-item (click)="aplicarAcao(s, 'FALTOU')" [disabled]="!pode('FALTOU', s)">
-                  <mat-icon>person_off</mat-icon>
-                  <span>Marcar faltou</span>
-                </button>
+                  <button mat-menu-item (click)="aplicarAcao(s, 'FALTOU')" [disabled]="!pode('FALTOU', s)">
+                    <mat-icon>person_off</mat-icon>
+                    <span>Paciente faltou</span>
+                  </button>
 
-                <button mat-menu-item (click)="aplicarAcao(s, 'REMARCAR')" [disabled]="!pode('REMARCAR', s)">
-                  <mat-icon>schedule</mat-icon>
-                  <span>Remarcar</span>
-                </button>
+                  <button mat-menu-item (click)="aplicarAcao(s, 'REMARCAR')" [disabled]="!pode('REMARCAR', s)">
+                    <mat-icon>schedule</mat-icon>
+                    <span>Remarcar avaliação (+1 dia)</span>
+                  </button>
 
-                <mat-divider></mat-divider>
+                  <mat-divider></mat-divider>
 
-                <button mat-menu-item (click)="aplicarAcao(s, 'CANCELAR')" [disabled]="!pode('CANCELAR', s)">
-                  <mat-icon>cancel</mat-icon>
-                  <span>Cancelar sessão</span>
-                </button>
+                  <button mat-menu-item (click)="aplicarAcao(s, 'CANCELAR')" [disabled]="!pode('CANCELAR', s)">
+                    <mat-icon>cancel</mat-icon>
+                    <span>Cancelar avaliação</span>
+                  </button>
+                </ng-container>
+
+                <!-- Menu para SESSÕES NORMAIS -->
+                <ng-container *ngIf="!isAvaliacao(s)">
+                  <button mat-menu-item (click)="aplicarAcao(s, 'COMPARECEU')" [disabled]="!pode('COMPARECEU', s)">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Marcar compareceu</span>
+                  </button>
+
+                  <button mat-menu-item (click)="aplicarAcao(s, 'FALTOU')" [disabled]="!pode('FALTOU', s)">
+                    <mat-icon>person_off</mat-icon>
+                    <span>Marcar faltou</span>
+                  </button>
+
+                  <button mat-menu-item (click)="aplicarAcao(s, 'REMARCAR')" [disabled]="!pode('REMARCAR', s)">
+                    <mat-icon>schedule</mat-icon>
+                    <span>Remarcar (+1 dia)</span>
+                  </button>
+
+                  <mat-divider></mat-divider>
+
+                  <button mat-menu-item (click)="aplicarAcao(s, 'CANCELAR')" [disabled]="!pode('CANCELAR', s)">
+                    <mat-icon>cancel</mat-icon>
+                    <span>Cancelar sessão</span>
+                  </button>
+                </ng-container>
               </mat-menu>
             </td>
           </tr>
 
           <tr *ngIf="sessoes.length === 0">
-            <td colspan="5" class="empty-row">
-              Nenhuma sessão para este dia.
+            <td colspan="7" class="empty-row">
+              <mat-icon>event_busy</mat-icon>
+              <p>Nenhuma sessão encontrada para os filtros selecionados.</p>
             </td>
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Legenda -->
+  <div class="legend-container">
+    <div class="legend-title">Legenda:</div>
+    <div class="legend-items">
+      <div class="legend-item">
+        <span class="legend-dot tipo-hoje"></span>
+        <span>Hoje</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot tipo-passada"></span>
+        <span>Atrasada (precisa atenção)</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot tipo-futura"></span>
+        <span>Futura</span>
+      </div>
     </div>
   </div>
 </div>

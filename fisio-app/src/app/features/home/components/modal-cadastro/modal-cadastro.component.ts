@@ -9,9 +9,10 @@ import {
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { ModalLeadHelper, ModalActionEvent } from '../../../../shared/helpers/modal-lead.helper';
 
 type ModalStep = 'opcoes' | 'form';
 
@@ -40,23 +41,21 @@ export class ModalCadastroComponent implements OnChanges {
   @Input() descricao = 'Como prefere falar com a gente?';
 
   @Output() close = new EventEmitter<void>();
-  @Output() buttonClick = new EventEmitter<{ action: string; value?: any; agendarAgora?: boolean }>();
+  @Output() buttonClick = new EventEmitter<ModalActionEvent>();
 
   step: ModalStep = 'opcoes';
+  form: FormGroup;
 
-  // Form para “Quero que me chamem” ou cadastro manual da recepção
-  form = new FormGroup({
-    nome: new FormControl('', Validators.required),
-    sobrenome: new FormControl(''),
-    telefone: new FormControl('', Validators.required),
-    email: new FormControl('', [Validators.email]),    observacao: new FormControl(''),    agendarAgora: new FormControl<boolean>(true), 
-  });
+  constructor() {
+    // Usa o helper para criar o form com campos opcionais
+    this.form = ModalLeadHelper.createLeadForm(true);
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['visible']?.currentValue === true) {
       // ✅ abre na etapa correta dependendo do modo
       this.step = this.modoInterno ? 'form' : 'opcoes';
-      this.form.reset();
+      ModalLeadHelper.resetForm(this.form);
     }
   }
 
@@ -78,17 +77,16 @@ export class ModalCadastroComponent implements OnChanges {
   }
 
   cadastrar(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+    if (!ModalLeadHelper.validateAndMarkTouched(this.form)) {
       return;
     }
 
-    const { agendarAgora, ...value } = this.form.getRawValue();
+    const { leadData, agendarAgora } = ModalLeadHelper.extractFormData(this.form.getRawValue());
 
     this.buttonClick.emit({
       action: 'criar-lead',
-      value,
-      agendarAgora: !!agendarAgora,
+      value: leadData,
+      agendarAgora,
     });
   }
 }
