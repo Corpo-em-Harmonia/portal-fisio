@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,7 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './modal-agendar-avaliacao.component.html',
   styleUrls: ['./modal-agendar-avaliacao.component.scss'],
 })
-export class ModalAgendarAvaliacaoComponent {
+export class ModalAgendarAvaliacaoComponent implements OnChanges {
   @Input() visible = false;
   @Output() close = new EventEmitter<void>();
   @Output() confirmarAgendamento = new EventEmitter<{ dataHora: string; observacao?: string }>();
@@ -22,6 +22,12 @@ export class ModalAgendarAvaliacaoComponent {
     hora: new FormControl('', Validators.required),
     observacao: new FormControl(''),
   });
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['visible']?.currentValue === true) {
+      this.form.reset();
+    }
+  }
 
   confirmar(): void {
     if (this.form.invalid) {

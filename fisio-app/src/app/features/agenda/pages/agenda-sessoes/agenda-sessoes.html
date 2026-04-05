@@ -36,7 +36,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let s of sessoes">
+          <tr *ngFor="let s of sessoes; trackBy: trackById">
             <td class="nome-cell">
               <span class="avatar-circle">{{ (s.pacienteNome?.charAt(0) || 'P') | uppercase }}</span>
               <span>{{ s.pacienteNome || s.pacienteId }}</span>
