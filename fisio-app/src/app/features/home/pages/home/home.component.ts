@@ -7,12 +7,13 @@ import { RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { ReactiveFormsModule, FormControl, Validators } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
-import { ModalCadastroComponent } from '../../components/modal-cadastro/modal-cadastro.component';
 import { LeadService } from '../../../../shared/service/lead.service';
 import { Lead } from '../../../../shared/models/lead';
 import { Input, Output, EventEmitter } from '@angular/core';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { ModalContatoComponent } from '../../modal-contato/modal-contato.component';
+import { ModalActionEvent } from '../../../../shared/helpers/modal-lead.helper';
 
 @Component({
   selector: 'app-home',
@@ -25,13 +26,13 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatInputModule,
     MatFormFieldModule,
     ReactiveFormsModule,
-    ModalCadastroComponent,
+    ModalContatoComponent,
     MatSnackBarModule,
   ],
-  templateUrl: './homeComponent.html',
-  styleUrls: ['./homeComponent.scss'],
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss'],
 })
-export class Home {
+export class HomeComponent {
   @ViewChild(MatMenuTrigger) trigger!: MatMenuTrigger;
 
   @Output() buttonClick = new EventEmitter<string>();
@@ -81,7 +82,7 @@ export class Home {
 
   constructor(private leadService: LeadService,private snackBar: MatSnackBar) { }
 
-onModalButtonClick(event: { action: string; value?: any }) {
+onModalButtonClick(event: ModalActionEvent) {
   switch (event.action) {
     case 'whatsapp':
       this.abrirWhatsapp();
@@ -95,10 +96,10 @@ onModalButtonClick(event: { action: string; value?: any }) {
 
     case 'criar-lead':
       this.criarLead(event.value);
-      // criarLead já fecha e mostra snackbar
       return;
   }
 }
+
 
   criarLead(formValue: any) {
     if (formValue && formValue.email) {

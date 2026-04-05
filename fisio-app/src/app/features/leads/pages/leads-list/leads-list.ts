@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy  } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
@@ -19,7 +19,7 @@ import {
 @Component({
   selector: 'app-leads-list',
   standalone: true,
-   changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterModule,
@@ -52,16 +52,16 @@ export class LeadsList implements OnInit {
   private carregarLeads(): void {
     this.isLoading = true;
 
-    this.leadService.getLeads().subscribe({
+    this.leadService.getLeadsAtivos().subscribe({
       next: (leads) => {
-          this.leads = [...leads]; // Cria nova referência
-          this.isLoading = false;
-          this.cdr.markForCheck();
+        this.leads = [...leads]; // Cria nova referência
+        this.isLoading = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
-          this.isLoading = false;
-          this.handleError('Erro ao buscar leads', err);
-          this.cdr.markForCheck();
+        this.isLoading = false;
+        this.handleError('Erro ao buscar leads', err);
+        this.cdr.markForCheck();
       },
     });
   }
@@ -76,26 +76,36 @@ export class LeadsList implements OnInit {
     this.leadSelecionadoParaAgendar = undefined;
   }
 
-  onConfirmarAgendamento(payload: { dataHora: string; observacao?: string }): void {
-
+  onConfirmarAgendamento(evento: { data: string; hora: string; observacao?: string }): void {
     if (!this.leadSelecionadoParaAgendar?.id) return;
 
-    this.leadService
-      .agendarAvaliacao(this.leadSelecionadoParaAgendar.id, payload)
-      .subscribe({
-        next: () => {
-          this.carregarLeads();
-          this.fecharModalAgendamento();
-        },
-        error: (err) => console.error('Erro ao agendar avaliação', err),
-      });
+    const payload = {
+      dataHora: `${evento.data}T${evento.hora}:00`,
+      observacao: evento.observacao
+    };
+
+    this.leadService.agendarAvaliacao(this.leadSelecionadoParaAgendar.id, payload).subscribe({
+      next: () => {
+        this.carregarLeads();
+        this.fecharModalAgendamento(); // ✅ aqui fecha
+      },
+      error: (err) => console.error('Erro ao agendar avaliação', err),
+    });
   }
+
   private handleError(message: string, error: any): void {
     console.error(message, error);
   }
 
   onSelectLead(lead: Lead): void {
     this.router.navigate(['/avaliacao'], { queryParams: { nome: lead.nome } });
+  }
+
+  private toInstantISO(date: string, time: string): string {
+    // date: "2026-02-14", time: "14:00"
+    // transforma em ISO Z (UTC)
+    const local = new Date(`${date}T${time}:00`);
+    return local.toISOString();
   }
 
   pode(acao: LeadAcao, lead: Lead): boolean {
@@ -150,20 +160,39 @@ export class LeadsList implements OnInit {
     this.isCadastroManualOpen = false;
   }
 
+  excluirLead(lead: Lead): void {
+    if (!lead.id) return; 
+    if (!confirm(`Tem certeza que deseja excluir o lead "${LeadHelper.getNomeCompleto(lead)}"?`)) return;
 
-
-  onCadastroManual(event: { action: 'criar-lead' | string; value?: Partial<Lead> }): void {
-    if (event.action !== 'criar-lead' || !event.value) return;
-
-    this.leadService.criarLead(event.value as Lead).subscribe({
-      next: (novo) => {
-        this.leads = [novo, ...this.leads];
-        this.fecharCadastroManual();
+    this.leadService.excluir(lead.id).subscribe({
+      next: () => {
+        this.leads = this.leads.filter(l => l.id !== lead.id);
         this.cdr.markForCheck();
       },
-      error: (err) => this.handleError('Erro ao criar lead manual', err),
+      error: (err) => this.handleError('Erro ao excluir lead', err),
     });
   }
+
+
+onCadastroManual(event: { action: 'criar-lead' | string; value?: Partial<Lead>; agendarAgora?: boolean }): void {
+  if (event.action !== 'criar-lead' || !event.value) return;
+
+  this.leadService.criarLead(event.value as Lead).subscribe({
+    next: (novo) => {
+      this.leads = [novo, ...this.leads];
+      this.fecharCadastroManual();
+
+      // ✅ Só abre se marcou a opção
+      if (event.agendarAgora) {
+        this.abrirModalAgendamento(novo);
+      }
+
+      this.cdr.markForCheck();
+    },
+    error: (err) => this.handleError('Erro ao criar lead manual', err),
+  });
+}
+
 
 
 }
