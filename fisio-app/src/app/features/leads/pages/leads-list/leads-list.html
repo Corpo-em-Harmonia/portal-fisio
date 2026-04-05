@@ -108,7 +108,7 @@
                   <span>Editar</span>
                 </button>
 
-                <button mat-menu-item >
+                <button mat-menu-item (click)="excluirLead(lead)">
                   <mat-icon>delete</mat-icon>
                   <span>Excluir</span>
                 </button>
@@ -133,6 +133,7 @@
 
 <app-modal-agendar-avaliacao
   [visible]="isAgendarModalOpen"
+  [lead]="leadSelecionadoParaAgendar"
   (close)="fecharModalAgendamento()"
   (confirmarAgendamento)="onConfirmarAgendamento($event)">
 </app-modal-agendar-avaliacao>

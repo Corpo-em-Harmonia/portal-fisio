@@ -11,7 +11,7 @@ describe('AvaliacaoForm', () => {
       imports: [AvaliacaoForm],
       providers: [{ provide: ActivatedRoute, useValue: { snapshot: { queryParams: {} } } }]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(AvaliacaoForm);
     component = fixture.componentInstance;

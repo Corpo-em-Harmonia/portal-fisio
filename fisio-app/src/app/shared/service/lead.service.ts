@@ -6,11 +6,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
-/**
- * Resposta da API ao agendar uma avaliação para um lead.
- * Retornada pelo endpoint POST /leads/:id/agendar-avaliacao.
- */
 export interface AgendarAvaliacaoResponse {
+    /** ID da sessão de avaliação criada */
     id: string | number;
     leadId: string | number;
     dataHora: string;
@@ -20,11 +17,6 @@ export interface AgendarAvaliacaoResponse {
 export type LeadAcao =
   | 'CANCELAR'
   | 'AGENDAR_AVALIACAO';
-
-interface AplicarAcaoResponse {
-    acao: LeadAcao;
-    lead: Lead;
-}
 
 @Injectable({
     providedIn: 'root'
@@ -39,10 +31,8 @@ export class LeadService extends BaseService<Lead> {
     /**
      * Obtém todos os leads
      */
-    getLeads(): Observable<Lead[]> {
-        return this.getAll().pipe(
-            map(leads => leads.map(lead => this.normalizeLead(lead)))
-        );
+    getLeadsAtivos(): Observable<Lead[]> {
+        return this.http.get<Lead[]>(this.getFullUrl(), { params: { ativos: 'true' } });
     }
 
     /**
@@ -151,4 +141,9 @@ export class LeadService extends BaseService<Lead> {
 
         return statusMap[s] || 'novo';
     }
+
+      
+  excluir(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.getFullUrl()}/${id}`);
+  }
 }

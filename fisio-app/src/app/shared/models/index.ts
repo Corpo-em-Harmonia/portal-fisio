@@ -7,3 +7,4 @@ export * from './lead';
 export * from './paciente';
 export * from './avaliacao';
 export * from './agendamento';
+export * from './fisio-workflow';

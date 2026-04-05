@@ -1,0 +1,51 @@
+<div class="custom-modal" *ngIf="visible">
+    <div class="custom-modal-content">
+        <button class="custom-modal-close" (click)="fechar()">×</button>
+
+        <h2 class="modal-title">Como você prefere iniciar?</h2>
+        <p class="modal-desc">Escolha uma opção ou deixe seus dados que a recepção chama você.</p>
+
+        <div class="actions">
+            <button mat-raised-button color="primary" type="button" (click)="clicarWhatsApp()">
+                Chamar no WhatsApp
+            </button>
+
+            <button mat-stroked-button type="button" (click)="clicarLigar()">
+                Ligar
+            </button>
+        </div>
+
+        <div class="divider"></div>
+
+        <h3 class="mini-title">Quero que me chamem</h3>
+
+        <form [formGroup]="form" (ngSubmit)="enviarContato()">
+            <mat-form-field appearance="outline" class="modal-field">
+                <mat-label>Nome</mat-label>
+                <input matInput formControlName="nome" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="modal-field">
+                <mat-label>Sobrenome</mat-label>
+                <input matInput formControlName="sobrenome" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="modal-field">
+                <mat-label>Telefone</mat-label>
+                <input matInput formControlName="telefone" />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="modal-field">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" />
+            </mat-form-field>
+
+            <div class="modal-actions modal-actions-row">
+                <button mat-button type="button" (click)="fechar()">Cancelar</button>
+                <button mat-raised-button color="accent" type="submit">
+                    Enviar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

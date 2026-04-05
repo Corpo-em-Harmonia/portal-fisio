@@ -4,6 +4,12 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
+interface GoniometriaEntry {
+  articulacao: string;
+  movimentoAvaliado: string;
+  graus: string | number;
+}
+
 interface UploadedFile {
   name: string;
   size: number;
@@ -37,7 +43,7 @@ export class AvaliacaoForm implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private snackBar: MatSnackBar,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -159,7 +165,7 @@ export class AvaliacaoForm implements OnInit {
   onSubmit(): void {
     if (this.avaliacaoForm.valid) {
       const formValue = this.avaliacaoForm.value;
-
+      
       const dataToSubmit = {
         lead_Id: formValue.leadId,
         medico: formValue.medico,
@@ -168,7 +174,7 @@ export class AvaliacaoForm implements OnInit {
         hpp: formValue.hpp,
         diagnostico: formValue.diagnostico,
         testesRealizados: formValue.testesRealizados.filter((t: string) => t.trim() !== '').join(' | '),
-        goniometria: formValue.goniometria.map((g: any) =>
+        goniometria: formValue.goniometria.map((g: GoniometriaEntry) =>
           `${g.articulacao} - ${g.movimentoAvaliado}: ${g.graus}°`
         ).join(' | '),
         condutaTerapeutica: formValue.condutaTerapeutica.join(', '),
@@ -179,15 +185,18 @@ export class AvaliacaoForm implements OnInit {
         observacoes: formValue.observacoes
       };
 
-      // TODO: substituir pelo serviço real quando AvaliacaoService for implementado
+      // TODO: implementar chamada ao serviço para salvar
       // this.avaliacaoService.salvar(dataToSubmit).subscribe(...)
-
-      this.snackBar.open('Avaliação salva com sucesso!', 'Fechar', { duration: 4000 });
+      
+      this.snackBar.open('Avaliação salva com sucesso!', 'Fechar', {
+        duration: 4000,
+        panelClass: ['success-snackbar']
+      });
       this.router.navigate(['/']);
     } else {
       this.snackBar.open('Por favor, preencha todos os campos obrigatórios', 'Fechar', {
         duration: 4000,
-        panelClass: ['snackbar-error'],
+        panelClass: ['error-snackbar']
       });
       this.markFormGroupTouched(this.avaliacaoForm);
     }

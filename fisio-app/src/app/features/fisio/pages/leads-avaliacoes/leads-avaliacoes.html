@@ -1,0 +1,110 @@
+<div class="leads-page-container">
+	<div class="top-nav">
+		<button class="nav-btn" (click)="navigateToDashboard()">Dashboard</button>
+		<button class="nav-btn nav-btn-active">Leads / Avaliações</button>
+	</div>
+
+	<div class="header-card">
+		<div class="header-icon">AV</div>
+		<div>
+			<h1 class="header-title">Leads e Avaliações</h1>
+			<p class="header-subtitle">Controle de primeira avaliação, pacientes ativos e evolução clínica.</p>
+		</div>
+	</div>
+
+	<section class="table-card">
+		<div class="table-card-header">
+			<h3>Aguardando Avaliação</h3>
+		</div>
+		<div class="table-wrap" *ngIf="avaliacoesPendentes.length; else noPendentes">
+			<table class="fisio-table">
+				<thead>
+					<tr>
+						<th>Nome</th>
+						<th>Origem</th>
+						<th>Telefone</th>
+						<th>Data/Hora</th>
+						<th>Status</th>
+						<th>Ação</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr *ngFor="let lead of avaliacoesPendentes">
+						<td>{{ lead.nome }}</td>
+						<td>{{ lead.origem }}</td>
+						<td>{{ lead.telefone }}</td>
+						<td>{{ lead.data | date:'dd/MM/yyyy HH:mm' }}</td>
+						<td>{{ lead.status }}</td>
+						<td>
+							<button class="btn-fisio" (click)="iniciarAvaliacao(lead)">Iniciar Avaliação</button>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<section class="table-card two-col">
+		<div>
+			<div class="table-card-header">
+				<h3>Pacientes Ativos</h3>
+			</div>
+			<div class="table-wrap" *ngIf="pacientesAtivos.length; else noAtivos">
+				<table class="fisio-table">
+					<thead>
+						<tr>
+							<th>Paciente</th>
+							<th>Última Sessão</th>
+							<th>Próxima Sessão</th>
+							<th>Ação</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let paciente of pacientesAtivos">
+							<td>{{ paciente.nome }}</td>
+							<td>{{ paciente.ultimaSessao ? (paciente.ultimaSessao | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+							<td>{{ paciente.proximaSessao ? (paciente.proximaSessao | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
+							<td>
+								<button class="btn-fisio" (click)="registrarEvolucao(paciente)">Registrar Evolução</button>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div>
+			<div class="table-card-header">
+				<h3>Histórico de Avaliações</h3>
+			</div>
+			<div class="table-wrap" *ngIf="historicoAvaliacoes.length; else noHistorico">
+				<table class="fisio-table">
+					<thead>
+						<tr>
+							<th>Paciente</th>
+							<th>Data</th>
+							<th>Resumo</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr *ngFor="let avaliacao of historicoAvaliacoes">
+							<td>{{ avaliacao.paciente }}</td>
+							<td>{{ avaliacao.data | date:'dd/MM/yyyy HH:mm' }}</td>
+							<td>{{ avaliacao.resumo }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+
+	<ng-template #noPendentes>
+		<div class="fisio-empty table-empty">Nenhuma avaliação pendente.</div>
+	</ng-template>
+	<ng-template #noAtivos>
+		<div class="fisio-empty table-empty">Nenhum paciente ativo.</div>
+	</ng-template>
+	<ng-template #noHistorico>
+		<div class="fisio-empty table-empty">Nenhuma avaliação registrada.</div>
+	</ng-template>
+</div>
