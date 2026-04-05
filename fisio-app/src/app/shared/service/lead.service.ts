@@ -6,6 +6,10 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
+/**
+ * Resposta da API ao agendar uma avaliação para um lead.
+ * Retornada pelo endpoint POST /leads/:id/agendar-avaliacao.
+ */
 export interface AgendarAvaliacaoResponse {
     id: string | number;
     leadId: string | number;

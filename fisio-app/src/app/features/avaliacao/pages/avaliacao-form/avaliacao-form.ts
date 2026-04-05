@@ -181,7 +181,6 @@ export class AvaliacaoForm implements OnInit {
 
       // TODO: substituir pelo serviço real quando AvaliacaoService for implementado
       // this.avaliacaoService.salvar(dataToSubmit).subscribe(...)
-      console.info('Dados da avaliação:', dataToSubmit);
 
       this.snackBar.open('Avaliação salva com sucesso!', 'Fechar', { duration: 4000 });
       this.router.navigate(['/']);
