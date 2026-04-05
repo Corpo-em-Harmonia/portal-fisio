@@ -6,6 +6,13 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 
+export interface AgendarAvaliacaoResponse {
+    id: string | number;
+    leadId: string | number;
+    dataHora: string;
+    observacao?: string;
+}
+
 export type LeadAcao =
   | 'CANCELAR'
   | 'AGENDAR_AVALIACAO';
@@ -79,9 +86,9 @@ export class LeadService extends BaseService<Lead> {
     agendarAvaliacao(
         leadId: string | number,
         body: { dataHora: string; observacao?: string }
-    ): Observable<any> {
+    ): Observable<AgendarAvaliacaoResponse> {
         const url = `${this.getFullUrl()}/${leadId}/agendar-avaliacao`;
-        return this.http.post(url, body);
+        return this.http.post<AgendarAvaliacaoResponse>(url, body);
     }
     /**
      * Verifica se uma ação pode ser executada no lead

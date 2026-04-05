@@ -10,9 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { ModalCadastroComponent } from '../../components/modal-cadastro/modal-cadastro.component';
 import { LeadService } from '../../../../shared/service/lead.service';
 import { Lead } from '../../../../shared/models/lead';
-import { Input, Output, EventEmitter } from '@angular/core';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-home',
@@ -34,7 +32,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class Home {
   @ViewChild(MatMenuTrigger) trigger!: MatMenuTrigger;
 
-  @Output() buttonClick = new EventEmitter<string>();
   modalVisivel = false;
 
   modalButtons = [
@@ -50,75 +47,70 @@ export class Home {
 
   emailFormControl = new FormControl('', [Validators.required, Validators.email]);
 
+  constructor(private leadService: LeadService, private snackBar: MatSnackBar) {}
 
   abrirWhatsapp(): void {
     const msg = encodeURIComponent('Olá! Quero agendar uma avaliação de fisioterapia.');
     window.open(`https://wa.me/${this.WHATSAPP_PHONE}?text=${msg}`, '_blank');
   }
 
-    ligar(): void {
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  ligar(): void {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      if (isMobile) {
-        window.location.href = `tel:${this.PHONE}`;
-      } else {
-        navigator.clipboard.writeText(this.PHONE);
-        this.snackBar.open(
-          'Número copiado! Ligue pelo seu telefone.',
-          'Fechar',
-          { duration: 4000 }
-        );
-      }
+    if (isMobile) {
+      window.location.href = `tel:${this.PHONE}`;
+    } else {
+      navigator.clipboard.writeText(this.PHONE);
+      this.snackBar.open(
+        'Número copiado! Ligue pelo seu telefone.',
+        'Fechar',
+        { duration: 4000 }
+      );
     }
+  }
 
-  openModal() {
+  openModal(): void {
     this.isModalOpen = true;
   }
 
-  closeModal() {
+  closeModal(): void {
     this.isModalOpen = false;
   }
 
-  constructor(private leadService: LeadService,private snackBar: MatSnackBar) { }
+  onModalButtonClick(event: { action: string; value?: Partial<Lead> }): void {
+    switch (event.action) {
+      case 'whatsapp':
+        this.abrirWhatsapp();
+        this.closeModal();
+        return;
 
-onModalButtonClick(event: { action: string; value?: any }) {
-  switch (event.action) {
-    case 'whatsapp':
-      this.abrirWhatsapp();
-      this.closeModal();
-      return;
+      case 'ligar':
+        this.ligar();
+        this.closeModal();
+        return;
 
-    case 'ligar':
-      this.ligar();
-      this.closeModal();
-      return;
-
-    case 'criar-lead':
-      this.criarLead(event.value);
-      // criarLead já fecha e mostra snackbar
-      return;
+      case 'criar-lead':
+        this.criarLead(event.value);
+        return;
+    }
   }
-}
 
-  criarLead(formValue: any) {
+  private criarLead(formValue?: Partial<Lead>): void {
     if (formValue && formValue.email) {
-      this.leadService.criarLead(formValue as Lead).subscribe({
-        next: (response) => {
+      this.leadService.criarLead(formValue).subscribe({
+        next: () => {
           this.isModalOpen = false;
           this.snackBar.open('Contato enviado com sucesso! Em breve entraremos em contato.', 'Fechar', {
             duration: 4000,
-            panelClass: ['snackbar-custom']
-          }
-        
-        );
-          // Atualize a lista se necessário
+            panelClass: ['snackbar-custom'],
+          });
         },
-        error: (err) => {
+        error: () => {
           this.snackBar.open('Erro ao enviar contato. Tente novamente.', 'Fechar', {
             duration: 4000,
-            panelClass: ['snackbar-custom']
+            panelClass: ['snackbar-custom'],
           });
-        }
+        },
       });
     }
   }

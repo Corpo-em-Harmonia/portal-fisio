@@ -3,8 +3,10 @@
  * Centraliza as URLs e configurações relacionadas à API
  */
 
+import { environment } from '../../../environments/environment';
+
 export const API_CONFIG = {
-    baseUrl: 'http://localhost:8080/api',
+    baseUrl: environment.apiBaseUrl,
     endpoints: {
         leads: 'leads',
         pacientes: 'pacientes',

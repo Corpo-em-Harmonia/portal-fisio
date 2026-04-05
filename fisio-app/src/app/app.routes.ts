@@ -3,34 +3,37 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: 'home',
-    loadChildren: () =>
-      import('./features/home/home-module')
-        .then(m => m.HomeModule)
+    loadComponent: () =>
+      import('./features/home/pages/home/homeComponent').then(m => m.Home),
   },
   {
     path: 'avaliacao',
-    loadChildren: () =>
-      import('./features/avaliacao/avaliacao-module')
-        .then(m => m.AvaliacaoModule)
+    loadComponent: () =>
+      import('./features/avaliacao/pages/avaliacao-form/avaliacao-form').then(m => m.AvaliacaoForm),
   },
   {
     path: 'leads',
-    loadChildren: () =>
-      import('./features/leads/leads-module')
-        .then(m => m.LeadsModule)
+    loadComponent: () =>
+      import('./features/leads/pages/leads-list/leads-list').then(m => m.LeadsList),
+  },
+  {
+    path: 'pacientes',
+    redirectTo: 'leads',
+    pathMatch: 'full',
   },
   {
     path: 'admin',
-    loadChildren: () =>
-      import('./features/admin/admin-module')
-        .then(m => m.AdminModule)
+    loadComponent: () =>
+      import('./features/admin/pages/admin-dashboard/admin-dashboard.component').then(
+        m => m.AdminDashboardComponent
+      ),
   },
   {
     path: 'agenda',
-    loadChildren: () =>
-      import('./features/agenda/agenda-module')
-    .then(m => m.AgendaModule)
+    loadComponent: () =>
+      import('./features/agenda/pages/agenda-sessoes/agenda-sessoes').then(
+        m => m.AgendaSessoesComponent
+      ),
   },
-  { path: '', redirectTo: 'leads', pathMatch: 'full' }
+  { path: '', redirectTo: 'leads', pathMatch: 'full' },
 ];
-

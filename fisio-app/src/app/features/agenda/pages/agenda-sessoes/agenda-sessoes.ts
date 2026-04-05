@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, UpperCasePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,6 +20,7 @@ type SessaoAcao = 'COMPARECEU' | 'FALTOU' | 'MARCAR_PERDIDO' | 'REMARCAR';
 @Component({
   selector: 'app-agenda-sessoes',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     MatIconModule,
@@ -36,7 +37,7 @@ export class AgendaSessoesComponent implements OnInit {
   sessoes: Sessao[] = [];
   selectedDate = this.todayISO();
 
-  constructor(private sessaoService: SessaoService) {}
+  constructor(private sessaoService: SessaoService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.carregar();
@@ -49,6 +50,7 @@ export class AgendaSessoesComponent implements OnInit {
           ...s,
           status: this.normalizeStatus(s.status),
         }));
+        this.cdr.markForCheck();
       },
       error: (err) => console.error('Erro ao buscar sessões', err),
     });
@@ -123,6 +125,11 @@ export class AgendaSessoesComponent implements OnInit {
       status: this.normalizeStatus(updated.status),
     };
     this.sessoes = this.sessoes.map((s) => (s.id === normalized.id ? normalized : s));
+    this.cdr.markForCheck();
+  }
+
+  trackById(_index: number, sessao: Sessao): string {
+    return sessao.id;
   }
 
   private normalizeStatus(value: unknown): SessaoStatus {

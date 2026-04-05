@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 interface UploadedFile {
   name: string;
@@ -13,7 +14,7 @@ interface UploadedFile {
 @Component({
   selector: 'app-avaliacao-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, MatSnackBarModule],
   templateUrl: './avaliacao-form.html',
   styleUrls: ['./avaliacao-form.scss']
 })
@@ -35,7 +36,8 @@ export class AvaliacaoForm implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
@@ -157,7 +159,7 @@ export class AvaliacaoForm implements OnInit {
   onSubmit(): void {
     if (this.avaliacaoForm.valid) {
       const formValue = this.avaliacaoForm.value;
-      
+
       const dataToSubmit = {
         lead_Id: formValue.leadId,
         medico: formValue.medico,
@@ -166,7 +168,7 @@ export class AvaliacaoForm implements OnInit {
         hpp: formValue.hpp,
         diagnostico: formValue.diagnostico,
         testesRealizados: formValue.testesRealizados.filter((t: string) => t.trim() !== '').join(' | '),
-        goniometria: formValue.goniometria.map((g: any) => 
+        goniometria: formValue.goniometria.map((g: any) =>
           `${g.articulacao} - ${g.movimentoAvaliado}: ${g.graus}°`
         ).join(' | '),
         condutaTerapeutica: formValue.condutaTerapeutica.join(', '),
@@ -177,15 +179,17 @@ export class AvaliacaoForm implements OnInit {
         observacoes: formValue.observacoes
       };
 
-      console.log('Dados para submeter:', dataToSubmit);
-      
-      // Aqui você faria a chamada ao serviço para salvar
+      // TODO: substituir pelo serviço real quando AvaliacaoService for implementado
       // this.avaliacaoService.salvar(dataToSubmit).subscribe(...)
-      
-      alert('Avaliação salva com sucesso!');
+      console.info('Dados da avaliação:', dataToSubmit);
+
+      this.snackBar.open('Avaliação salva com sucesso!', 'Fechar', { duration: 4000 });
       this.router.navigate(['/']);
     } else {
-      alert('Por favor, preencha todos os campos obrigatórios');
+      this.snackBar.open('Por favor, preencha todos os campos obrigatórios', 'Fechar', {
+        duration: 4000,
+        panelClass: ['snackbar-error'],
+      });
       this.markFormGroupTouched(this.avaliacaoForm);
     }
   }
