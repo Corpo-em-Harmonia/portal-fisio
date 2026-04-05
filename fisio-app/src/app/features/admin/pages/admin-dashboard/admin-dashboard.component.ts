@@ -1,29 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
-
-interface Agendamento {
-  id: string;
-  pacienteId: string;
-  pacienteNome: string;
-  data: string;
-  horario: string;
-  duracao: number;
-  tipo: 'avaliacao' | 'sessao' | 'retorno';
-  status: 'agendado' | 'confirmado' | 'realizado' | 'cancelado' | 'faltou';
-}
-
-interface Paciente {
-  id: string;
-  nome: string;
-  ultimaSessao: string;
-  proximaSessao: string;
-  totalSessoes: number;
-  status: 'ativo' | 'inativo';
-}
+import { SessaoService, EstatisticasSessao } from '../../../../shared/service/sessao.service';
+import { Sessao } from '../../../../shared/models/sessao';
+import { DashboardAgendamento, DashboardPaciente } from './admin-dashboard.models';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -32,8 +14,9 @@ interface Paciente {
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, MatSnackBarModule]
 })
-export class AdminDashboardComponent {
+export class AdminDashboardComponent implements OnInit {
   currentDate = new Date();
+  selectedDay = new Date();
   selectedPaciente = '';
   searchTerm = '';
   filterStatus = 'todos';
@@ -56,28 +39,26 @@ export class AdminDashboardComponent {
 
   years: number[] = [];
 
-  constructor(private router: Router, private snackBar: MatSnackBar) {
+  estatisticasApi: EstatisticasSessao | null = null;
+
+  constructor(
+    private router: Router,
+    private snackBar: MatSnackBar,
+    private sessaoService: SessaoService
+  ) {
     const currentYear = new Date().getFullYear();
     for (let i = currentYear - 5; i <= currentYear + 2; i++) {
       this.years.push(i);
     }
   }
 
-  agendamentos: Agendamento[] = [
-    { id: '1', pacienteId: '1', pacienteNome: 'Maria Silva', data: '2026-01-27', horario: '09:00', duracao: 50, tipo: 'sessao', status: 'confirmado' },
-    { id: '2', pacienteId: '2', pacienteNome: 'João Santos', data: '2026-01-27', horario: '10:00', duracao: 50, tipo: 'avaliacao', status: 'agendado' },
-    { id: '3', pacienteId: '3', pacienteNome: 'Ana Costa', data: '2026-01-27', horario: '14:00', duracao: 50, tipo: 'sessao', status: 'confirmado' },
-    { id: '4', pacienteId: '1', pacienteNome: 'Maria Silva', data: '2026-01-28', horario: '09:00', duracao: 50, tipo: 'sessao', status: 'agendado' },
-    { id: '5', pacienteId: '4', pacienteNome: 'Pedro Oliveira', data: '2026-01-28', horario: '15:00', duracao: 50, tipo: 'retorno', status: 'agendado' },
-    { id: '6', pacienteId: '2', pacienteNome: 'João Santos', data: '2026-01-29', horario: '11:00', duracao: 50, tipo: 'sessao', status: 'agendado' }
-  ];
+  ngOnInit(): void {
+    this.carregarDashboard();
+  }
 
-  pacientes: Paciente[] = [
-    { id: '1', nome: 'Maria Silva', ultimaSessao: '2026-01-20', proximaSessao: '2026-01-27', totalSessoes: 12, status: 'ativo' },
-    { id: '2', nome: 'João Santos', ultimaSessao: '2026-01-22', proximaSessao: '2026-01-27', totalSessoes: 5, status: 'ativo' },
-    { id: '3', nome: 'Ana Costa', ultimaSessao: '2026-01-23', proximaSessao: '2026-01-27', totalSessoes: 8, status: 'ativo' },
-    { id: '4', nome: 'Pedro Oliveira', ultimaSessao: '2026-01-15', proximaSessao: '2026-01-28', totalSessoes: 3, status: 'ativo' }
-  ];
+  agendamentos: DashboardAgendamento[] = [];
+
+  pacientes: DashboardPaciente[] = [];
 
   getWeekDays() {
     const days = [];
@@ -92,7 +73,7 @@ export class AdminDashboardComponent {
   }
 
   getAgendamentosForDay(date: Date) {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = this.toLocalIsoDate(date);
     return this.agendamentos.filter(ag => {
       const matchDate = ag.data === dateStr;
       const matchPaciente = this.selectedPaciente ? ag.pacienteId === this.selectedPaciente : true;
@@ -121,18 +102,25 @@ export class AdminDashboardComponent {
 
   get stats() {
     const weekDays = this.getWeekDays();
+    const totalCompareceu = this.estatisticasApi?.comparecidas ?? 0;
+    const totalBase = this.estatisticasApi?.total ?? 0;
+    const taxaPresenca = totalBase > 0 ? Math.round((totalCompareceu / totalBase) * 100) : 0;
+    const hojeLocal = this.toLocalIsoDate(new Date());
+    const inicioSemana = this.startOfDay(weekDays[0]);
+    const fimSemana = this.startOfDay(weekDays[6]);
+
     return {
       totalPacientes: this.pacientes.filter(p => p.status === 'ativo').length,
-      sessoesHoje: this.agendamentos.filter(a => a.data === new Date().toISOString().split('T')[0]).length,
+      sessoesHoje: this.agendamentos.filter(a => a.data === hojeLocal).length,
       sessoesSemana: this.agendamentos.filter(a => {
-        const agDate = new Date(a.data);
-        return agDate >= weekDays[0] && agDate <= weekDays[6];
+        const agDate = this.parseIsoDateLocal(a.data);
+        return !!agDate && agDate >= inicioSemana && agDate <= fimSemana;
       }).length,
-      taxaPresenca: 92
+      taxaPresenca
     };
   }
 
-  getStatusColor(status: Agendamento['status']): string {
+  getStatusColor(status: DashboardAgendamento['status']): string {
     switch (status) {
       case 'agendado':
         return 'status-agendado';
@@ -147,7 +135,7 @@ export class AdminDashboardComponent {
     }
   }
 
-  getTipoLabel(tipo: Agendamento['tipo']): string {
+  getTipoLabel(tipo: DashboardAgendamento['tipo']): string {
     switch (tipo) {
       case 'avaliacao':
         return 'Avaliação';
@@ -188,7 +176,7 @@ export class AdminDashboardComponent {
   }
 
   navigateToLeads(): void {
-    this.router.navigate(['/pacientes']);
+    this.router.navigate(['/leads-avaliacoes']);
   }
 
   novoAgendamento(): void {
@@ -220,6 +208,7 @@ export class AdminDashboardComponent {
 
   goToToday(): void {
     this.currentDate = new Date();
+    this.selectedDay = new Date();
   }
 
   toggleDatePicker(): void {
@@ -230,11 +219,135 @@ export class AdminDashboardComponent {
     return this.agendamentos.filter(ag => {
       const matchPaciente = this.selectedPaciente ? ag.pacienteId === this.selectedPaciente : true;
       const matchStatus = this.filterStatus !== 'todos' ? ag.status === this.filterStatus : true;
-      return matchPaciente && matchStatus;
+      const agDate = this.parseIsoDateLocal(ag.data);
+      const matchSelectedDay = !!agDate && this.sameDay(agDate, this.selectedDay);
+      return matchPaciente && matchStatus && matchSelectedDay;
     }).sort((a, b) => {
       const dateA = new Date(a.data + ' ' + a.horario);
       const dateB = new Date(b.data + ' ' + b.horario);
       return dateA.getTime() - dateB.getTime();
     });
+  }
+
+  setSelectedDay(day: Date): void {
+    this.selectedDay = this.startOfDay(day);
+  }
+
+  isSelectedDay(day: Date): boolean {
+    return this.sameDay(day, this.selectedDay);
+  }
+
+  get selectedDayLabel(): string {
+    return this.selectedDay.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: '2-digit',
+    });
+  }
+
+  private carregarDashboard(): void {
+    this.sessaoService.listar({ periodo: 'todos' }).subscribe({
+      next: (sessoes) => {
+        this.agendamentos = (sessoes ?? []).map((s) => this.mapSessaoToDashboardAgendamento(s));
+        this.pacientes = this.montarPacientes(sessoes ?? []);
+      },
+      error: (err) => {
+        console.error('Erro ao carregar sessões do dashboard', err);
+      },
+    });
+
+    this.sessaoService.obterEstatisticas().subscribe({
+      next: (stats) => {
+        this.estatisticasApi = stats;
+      },
+      error: (err) => {
+        console.error('Erro ao carregar estatísticas do dashboard', err);
+      },
+    });
+  }
+
+  private mapSessaoToDashboardAgendamento(sessao: Sessao): DashboardAgendamento {
+    const dataRef = new Date(sessao.dataHora);
+    const data = isNaN(dataRef.getTime()) ? '' : this.toLocalIsoDate(dataRef);
+    const horario = isNaN(dataRef.getTime())
+      ? '00:00'
+      : dataRef.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    return {
+      id: String(sessao.id),
+      pacienteId: String(sessao.pacienteId ?? ''),
+      pacienteNome: (sessao.pacienteNome ?? '').trim() || `Paciente ${sessao.pacienteId ?? ''}`,
+      data,
+      hora: horario,
+      horario,
+      duracao: 50,
+      tipo: sessao.tipoSessao ?? 'sessao',
+      status: this.mapStatusToDashboard(sessao.status),
+    };
+  }
+
+  private mapStatusToDashboard(status: Sessao['status']): DashboardAgendamento['status'] {
+    if (status === 'cancelada') return 'cancelado';
+    if (status === 'faltou') return 'faltou';
+    if (status === 'compareceu' || status === 'avaliada') return 'realizado';
+    if (status === 'marcada' || status === 'remarcada' || status === 'aguardando_avaliacao') return 'agendado';
+    return 'agendado';
+  }
+
+  private montarPacientes(sessoes: Sessao[]): DashboardPaciente[] {
+    const porNome = new Map<string, Date[]>();
+    const agora = new Date();
+
+    for (const s of sessoes) {
+      const nome = (s.pacienteNome ?? '').trim();
+      if (!nome || s.status === 'cancelada') continue;
+      const data = new Date(s.dataHora);
+      if (isNaN(data.getTime())) continue;
+      const lista = porNome.get(nome) ?? [];
+      lista.push(data);
+      porNome.set(nome, lista);
+    }
+
+    let idx = 1;
+    return Array.from(porNome.entries()).map(([nome, datas]) => {
+      datas.sort((a, b) => a.getTime() - b.getTime());
+      const ultima = [...datas].reverse().find((d) => d.getTime() <= agora.getTime()) ?? datas[datas.length - 1];
+      const proxima = datas.find((d) => d.getTime() >= agora.getTime()) ?? datas[datas.length - 1];
+      return {
+        id: String(idx++),
+        nome,
+        ultimaSessao: ultima.toISOString(),
+        proximaSessao: proxima.toISOString(),
+        totalSessoes: datas.length,
+        status: 'ativo',
+      };
+    });
+  }
+
+  private toLocalIsoDate(date: Date): string {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private parseIsoDateLocal(isoDate: string): Date | null {
+    const parts = isoDate?.split('-');
+    if (!parts || parts.length !== 3) return null;
+    const y = Number(parts[0]);
+    const m = Number(parts[1]);
+    const d = Number(parts[2]);
+    if (!y || !m || !d) return null;
+    return new Date(y, m - 1, d);
+  }
+
+  private startOfDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  private sameDay(a: Date, b: Date): boolean {
+    return a.getFullYear() === b.getFullYear()
+      && a.getMonth() === b.getMonth()
+      && a.getDate() === b.getDate();
   }
 }

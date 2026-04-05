@@ -34,6 +34,8 @@
     </div>
   </div>
 
+
+
   <!-- Stats Cards -->
   <div class="stats-grid">
     <div class="stat-card stat-purple">
@@ -189,7 +191,12 @@
             {{ getDayName(i) }}
           </div>
           
-          <div *ngFor="let day of getWeekDays()" class="day-cell" [class.today]="isToday(day)">
+          <div
+            *ngFor="let day of getWeekDays()"
+            class="day-cell"
+            [class.today]="isToday(day)"
+            [class.selected]="isSelectedDay(day)"
+            (click)="setSelectedDay(day)">
             <div class="day-number">{{ day.getDate() }}</div>
             <div class="day-events">
               <div *ngFor="let ag of getAgendamentosForDay(day)" 
@@ -204,7 +211,7 @@
 
         <!-- Detailed Appointments -->
         <div class="appointments-detailed">
-          <h4>Agendamentos Detalhados</h4>
+          <h4>Agendamentos do Dia: {{ selectedDayLabel }}</h4>
           <div class="appointments-list">
             <div *ngFor="let ag of filteredAgendamentos" class="appointment-card">
               <div class="appointment-date">
@@ -220,6 +227,9 @@
               <div class="appointment-status" [ngClass]="getStatusColor(ag.status)">
                 {{ ag.status }}
               </div>
+            </div>
+            <div *ngIf="filteredAgendamentos.length === 0" class="appointments-empty">
+              Nenhum agendamento para este dia com os filtros atuais.
             </div>
           </div>
         </div>

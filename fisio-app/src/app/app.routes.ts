@@ -36,6 +36,12 @@ export const routes: Routes = [
         .then(m => m.AdminDashboardComponent)
   },
   {
+    path: 'leads-avaliacoes',
+    loadComponent: () =>
+      import('./features/fisio/pages/leads-avaliacoes/leads-avaliacoes')
+        .then(m => m.LeadsAvaliacoes)
+  },
+  {
     path: 'agenda',
     loadComponent: () =>
       import('./features/agenda/pages/agenda-sessoes/agenda-sessoes')

@@ -94,7 +94,7 @@ export class AgendaSessoesComponent implements OnInit {
     if (this.selectedPeriodo === 'custom') {
       filtros.date = this.selectedDate;
     } else {
-      filtros.periodo = this.selectedPeriodo as any;
+      filtros.periodo = this.selectedPeriodo as FiltrosSessao['periodo'];
     }
 
     if (this.selectedStatus !== 'todas') {
@@ -180,7 +180,7 @@ export class AgendaSessoesComponent implements OnInit {
   }
 
   isAvaliacao(sessao: Sessao): boolean {
-    return sessao.tipoSessao === 'avaliacao';
+    return sessao.tipoSessao === 'avaliacao' || this.isPrimeiraAvaliacao(sessao);
   }
 
   marcarCompareceuAvaliacao(sessao: Sessao): void {
@@ -212,7 +212,9 @@ export class AgendaSessoesComponent implements OnInit {
 
     const call =
       acao === 'COMPARECEU'
-        ? this.sessaoService.marcarCompareceu(sessao.id)
+        ? this.isPrimeiraAvaliacao(sessao)
+          ? this.sessaoService.marcarCompareceuAvaliacao(sessao.id)
+          : this.sessaoService.marcarCompareceu(sessao.id)
         : acao === 'FALTOU'
         ? this.sessaoService.marcarFaltou(sessao.id)
         : this.sessaoService.cancelar(sessao.id);
@@ -314,5 +316,11 @@ export class AgendaSessoesComponent implements OnInit {
     const d = new Date(iso);
     d.setDate(d.getDate() + 1);
     return d.toISOString();
+  }
+
+  private isPrimeiraAvaliacao(sessao: Sessao): boolean {
+    const pacienteId = sessao.pacienteId;
+    const leadId = sessao.leadId;
+    return !pacienteId || !!leadId;
   }
 }
