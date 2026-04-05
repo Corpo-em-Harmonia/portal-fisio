@@ -42,8 +42,8 @@ export class HomeComponent {
     { label: 'Quero que me chamem', action: 'criar-lead', color: 'accent' },
   ];
 
-  private readonly WHATSAPP_PHONE = '5511999999999'; // coloca o número real
-  private readonly PHONE = '+5511999999999';
+  private readonly WHATSAPP_PHONE = '5511999999999'; // TODO: substitua pelo número real do WhatsApp
+  private readonly PHONE = '+5511999999999'; // TODO: substitua pelo número real de telefone
 
   isModalOpen = false;
 
