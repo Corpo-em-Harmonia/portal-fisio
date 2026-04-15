@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -44,7 +44,8 @@ export class AdminDashboardComponent implements OnInit {
   constructor(
     private router: Router,
     private snackBar: MatSnackBar,
-    private sessaoService: SessaoService
+    private sessaoService: SessaoService,
+    private ngZone: NgZone,
   ) {
     const currentYear = new Date().getFullYear();
     for (let i = currentYear - 5; i <= currentYear + 2; i++) {
@@ -248,8 +249,10 @@ export class AdminDashboardComponent implements OnInit {
   private carregarDashboard(): void {
     this.sessaoService.listar({ periodo: 'todos' }).subscribe({
       next: (sessoes) => {
-        this.agendamentos = (sessoes ?? []).map((s) => this.mapSessaoToDashboardAgendamento(s));
-        this.pacientes = this.montarPacientes(sessoes ?? []);
+        this.ngZone.run(() => {
+          this.agendamentos = (sessoes ?? []).map((s) => this.mapSessaoToDashboardAgendamento(s));
+          this.pacientes = this.montarPacientes(sessoes ?? []);
+        });
       },
       error: (err) => {
         console.error('Erro ao carregar sessões do dashboard', err);
@@ -258,7 +261,9 @@ export class AdminDashboardComponent implements OnInit {
 
     this.sessaoService.obterEstatisticas().subscribe({
       next: (stats) => {
-        this.estatisticasApi = stats;
+        this.ngZone.run(() => {
+          this.estatisticasApi = stats;
+        });
       },
       error: (err) => {
         console.error('Erro ao carregar estatísticas do dashboard', err);

@@ -16,7 +16,7 @@
 		<div class="table-card-header">
 			<h3>Aguardando Avaliação</h3>
 		</div>
-		<div class="table-wrap" *ngIf="avaliacoesPendentes.length; else noPendentes">
+		<div class="table-wrap" *ngIf="avaliacoesPendentes().length; else noPendentes">
 			<table class="fisio-table">
 				<thead>
 					<tr>
@@ -29,11 +29,11 @@
 					</tr>
 				</thead>
 				<tbody>
-					<tr *ngFor="let lead of avaliacoesPendentes">
+					<tr *ngFor="let lead of avaliacoesPendentes()">
 						<td>{{ lead.nome }}</td>
 						<td>{{ lead.origem }}</td>
 						<td>{{ lead.telefone }}</td>
-						<td>{{ lead.data | date:'dd/MM/yyyy HH:mm' }}</td>
+						<td>{{ lead.data ? (lead.data | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
 						<td>{{ lead.status }}</td>
 						<td>
 							<button class="btn-fisio" (click)="iniciarAvaliacao(lead)">Iniciar Avaliação</button>
@@ -49,7 +49,7 @@
 			<div class="table-card-header">
 				<h3>Pacientes Ativos</h3>
 			</div>
-			<div class="table-wrap" *ngIf="pacientesAtivos.length; else noAtivos">
+			<div class="table-wrap" *ngIf="pacientesAtivos().length; else noAtivos">
 				<table class="fisio-table">
 					<thead>
 						<tr>
@@ -60,7 +60,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr *ngFor="let paciente of pacientesAtivos">
+						<tr *ngFor="let paciente of pacientesAtivos()">
 							<td>{{ paciente.nome }}</td>
 							<td>{{ paciente.ultimaSessao ? (paciente.ultimaSessao | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
 							<td>{{ paciente.proximaSessao ? (paciente.proximaSessao | date:'dd/MM/yyyy HH:mm') : '-' }}</td>
@@ -77,7 +77,7 @@
 			<div class="table-card-header">
 				<h3>Histórico de Avaliações</h3>
 			</div>
-			<div class="table-wrap" *ngIf="historicoAvaliacoes.length; else noHistorico">
+			<div class="table-wrap" *ngIf="historicoAvaliacoes().length; else noHistorico">
 				<table class="fisio-table">
 					<thead>
 						<tr>
@@ -87,7 +87,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr *ngFor="let avaliacao of historicoAvaliacoes">
+						<tr *ngFor="let avaliacao of historicoAvaliacoes()">
 							<td>{{ avaliacao.paciente }}</td>
 							<td>{{ avaliacao.data | date:'dd/MM/yyyy HH:mm' }}</td>
 							<td>{{ avaliacao.resumo }}</td>

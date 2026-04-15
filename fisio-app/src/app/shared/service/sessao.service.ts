@@ -91,8 +91,8 @@ export class SessaoService {
   }
 
   listarFilaAvaliacaoFisio(): Observable<FisioFilaItem[]> {
-    return this.http.get<unknown[]>(`${this.avaliacoesBaseUrl}/pendentes`).pipe(
-      map((rows) => this.mapPendentesPayload(rows)),
+    return this.http.get<unknown>(`${this.avaliacoesBaseUrl}/pendentes`).pipe(
+      map((payload) => this.mapPendentesPayload(this.extractList(payload))),
       catchError(() =>
         this.listarAguardandoAvaliacao().pipe(
           map((sessoes) => this.mapSessoesToFila(sessoes ?? []))
@@ -102,16 +102,16 @@ export class SessaoService {
   }
 
   listarPacientesAtivosFisio(): Observable<FisioPacienteAtivoItem[]> {
-    return this.http.get<unknown[]>(`${this.pacientesBaseUrl}/ativos`).pipe(
-      map((rows) => {
-        return (rows ?? []).map((row) => {
+    return this.http.get<unknown>(`${this.pacientesBaseUrl}/ativos`).pipe(
+      map((payload) => {
+        return this.extractList(payload).map((row) => {
           const r = this.asRecord(row);
           return {
-            nome: String(r['nome'] ?? '').trim(),
-            ultimaSessao: (r['ultimaSessao'] as string | null | undefined) ?? null,
-            proximaSessao: (r['proximaSessao'] as string | null | undefined) ?? null,
+            nome: String(r['nome'] ?? r['paciente'] ?? '').trim(),
+            ultimaSessao: (r['ultimaSessao'] ?? r['ultima_sessao'] ?? null) as string | null,
+            proximaSessao: (r['proximaSessao'] ?? r['proxima_sessao'] ?? null) as string | null,
           };
-        });
+        }).filter((item) => !!item.nome);
       }),
       catchError(() =>
         this.listar({ periodo: 'todos' }).pipe(
@@ -122,22 +122,26 @@ export class SessaoService {
   }
 
   listarHistoricoAvaliacoesFisio(): Observable<FisioHistoricoAvaliacaoItem[]> {
-    return this.http.get<unknown[]>(`${this.avaliacoesBaseUrl}/historico`).pipe(
-      map((rows) => {
-        return (rows ?? []).map((row) => {
+    return this.http.get<unknown>(`${this.avaliacoesBaseUrl}/historico`).pipe(
+      map((payload) => {
+        return this.extractList(payload).map((row) => {
           const r = this.asRecord(row);
           return {
             paciente: String(r['paciente'] ?? r['nome'] ?? 'Paciente'),
-            data: String(r['data'] ?? r['dataHora'] ?? ''),
+            data: String(r['data'] ?? r['dataHora'] ?? r['data_hora'] ?? ''),
             resumo: String(r['resumo'] ?? 'Avaliação concluída'),
           };
-        });
+        }).filter((item) => !!item.data);
       }),
       catchError(() =>
         this.listar({ periodo: 'todos' }).pipe(
           map((sessoes) =>
             (sessoes ?? [])
-              .filter((s) => s.tipoSessao === 'avaliacao' && s.status === 'avaliada' && !!s.pacienteNome)
+              .filter((s) => {
+                const tipoSessao = this.normalizeText(s.tipoSessao);
+                const status = this.normalizeText(s.status);
+                return tipoSessao === 'avaliacao' && status === 'avaliada' && !!s.pacienteNome;
+              })
               .map((s) => ({
                 paciente: String(s.pacienteNome),
                 data: s.dataHora,
@@ -155,12 +159,12 @@ export class SessaoService {
       .map((row) => {
         const r = this.asRecord(row);
         return {
-          idSessao: String(r['idSessao'] ?? r['id'] ?? ''),
-          idLead: (r['idLead'] ?? r['leadId'] ?? null) as string | null,
-          idPaciente: (r['idPaciente'] ?? r['pacienteId'] ?? null) as string | null,
+          idSessao: String(r['idSessao'] ?? r['sessaoId'] ?? r['id_sessao'] ?? r['id'] ?? ''),
+          idLead: (r['idLead'] ?? r['leadId'] ?? r['id_lead'] ?? null) as string | null,
+          idPaciente: (r['idPaciente'] ?? r['pacienteId'] ?? r['id_paciente'] ?? null) as string | null,
           nome: String(r['nome'] ?? r['pacienteNome'] ?? 'Paciente').trim(),
           telefone: String(r['telefone'] ?? r['pacienteTelefone'] ?? '-'),
-          dataHora: String(r['dataHora'] ?? ''),
+          dataHora: String(r['dataHora'] ?? r['data_hora'] ?? r['data'] ?? ''),
           status: String(r['status'] ?? 'aguardando_avaliacao'),
           origem: (String(r['origem'] ?? '').toUpperCase() === 'PACIENTE' ? 'PACIENTE' : 'LEAD') as
             | 'LEAD'
@@ -170,9 +174,26 @@ export class SessaoService {
       .filter((item) => !!item.idSessao && !!item.dataHora);
   }
 
+  private extractList(payload: unknown): unknown[] {
+    if (Array.isArray(payload)) return payload;
+
+    const record = this.asRecord(payload);
+    const maybeList =
+      record['content'] ??
+      record['items'] ??
+      record['data'] ??
+      record['result'] ??
+      record['rows'];
+
+    return Array.isArray(maybeList) ? maybeList : [];
+  }
+
   private mapSessoesToFila(sessoes: Sessao[]): FisioFilaItem[] {
     return (sessoes ?? [])
-      .filter((s) => s.status === 'aguardando_avaliacao' || s.status === 'compareceu')
+      .filter((s) => {
+        const status = this.normalizeText(s.status);
+        return status === 'aguardando_avaliacao' || status === 'compareceu';
+      })
       .map((s) => {
         const isLead = !s.pacienteId || !!s.leadId;
         return {
@@ -182,7 +203,7 @@ export class SessaoService {
           nome: String(s.pacienteNome ?? (s.pacienteId ? `Paciente ${s.pacienteId}` : 'Paciente')).trim(),
           telefone: String(s.pacienteTelefone ?? '-'),
           dataHora: s.dataHora,
-          status: s.status,
+          status: this.normalizeText(s.status),
           origem: isLead ? 'LEAD' : 'PACIENTE',
         };
       });
@@ -216,6 +237,10 @@ export class SessaoService {
 
   private asRecord(value: unknown): Record<string, unknown> {
     return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+  }
+
+  private normalizeText(value: unknown): string {
+    return String(value ?? '').trim().toLowerCase();
   }
 
 

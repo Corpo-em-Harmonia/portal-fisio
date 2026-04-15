@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule, UpperCasePipe } from '@angular/common';
+import { Component, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { httpResource } from '@angular/common/http';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
@@ -9,8 +10,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
-import { SessaoService, FiltrosSessao, EstatisticasSessao } from '../../../../shared/service/sessao.service';
-import { Sessao, SessaoStatus, TipoSessao as TipoSessaoModel } from '../../../../shared/models/sessao';
+import { SessaoService, EstatisticasSessao } from '../../../../shared/service/sessao.service';
+import { Sessao, SessaoStatus } from '../../../../shared/models/sessao';
 import {
   SESSAO_STATUS_BADGE_CLASS,
   SESSAO_STATUS_FALLBACK_CLASS,
@@ -43,22 +44,90 @@ interface SessaoComTipo extends Sessao {
   templateUrl: './agenda-sessoes.html',
   styleUrls: ['./agenda-sessoes.scss'],
 })
-export class AgendaSessoesComponent implements OnInit {
-  sessoes: SessaoComTipo[] = [];
-  selectedDate = this.todayISO();
-  selectedPeriodo: string = 'pendentes';
-  selectedStatus: string = 'todas';
-  
-  estatisticas: EstatisticasSessao = {
-    total: 0,
-    hoje: 0,
-    pendentes: 0,
-    marcadas: 0,
-    comparecidas: 0,
-    faltas: 0,
-    canceladas: 0,
-    remarcadas: 0,
-  };
+export class AgendaSessoesComponent {
+  private readonly selectedDateSignal = signal(this.todayISO());
+  private readonly selectedPeriodoSignal = signal<string>('pendentes');
+  private readonly selectedStatusSignal = signal<string>('todas');
+  private readonly refreshSessoesTick = signal(0);
+  private readonly refreshStatsTick = signal(0);
+
+  readonly sessoesResource = httpResource<Sessao[]>(
+    () => {
+      this.refreshSessoesTick();
+
+      const periodo = this.selectedPeriodoSignal();
+      const status = this.selectedStatusSignal();
+      const date = this.selectedDateSignal();
+      const params = new URLSearchParams();
+
+      if (periodo === 'custom') {
+        if (date) params.set('date', date);
+      } else {
+        params.set('periodo', periodo);
+      }
+
+      if (status !== 'todas') {
+        params.set('status', status);
+      }
+
+      const query = params.toString();
+      return query ? `/api/sessoes?${query}` : '/api/sessoes';
+    },
+    { defaultValue: [] }
+  );
+
+  readonly estatisticasResource = httpResource<EstatisticasSessao>(
+    () => {
+      this.refreshStatsTick();
+      return '/api/sessoes/estatisticas';
+    },
+    {
+      defaultValue: {
+        total: 0,
+        hoje: 0,
+        pendentes: 0,
+        marcadas: 0,
+        comparecidas: 0,
+        faltas: 0,
+        canceladas: 0,
+        remarcadas: 0,
+      },
+    }
+  );
+
+  readonly sessoes = computed<SessaoComTipo[]>(() =>
+    (this.sessoesResource.value() ?? []).map((s) => ({
+      ...s,
+      status: this.normalizeStatus(s.status),
+      tipo: this.calcularTipo(s.dataHora),
+    }))
+  );
+
+  readonly estatisticas = computed(() => this.estatisticasResource.value());
+
+  get selectedDate(): string {
+    return this.selectedDateSignal();
+  }
+
+  set selectedDate(value: string) {
+    this.selectedDateSignal.set(value);
+  }
+
+  get selectedPeriodo(): string {
+    return this.selectedPeriodoSignal();
+  }
+
+  set selectedPeriodo(value: string) {
+    this.selectedPeriodoSignal.set(value);
+  }
+
+  get selectedStatus(): string {
+    return this.selectedStatusSignal();
+  }
+
+  set selectedStatus(value: string) {
+    this.selectedStatusSignal.set(value);
+  }
 
   periodos = [
     { value: 'pendentes', label: 'Pendentes (Hoje + Atrasadas)' },
@@ -82,74 +151,24 @@ export class AgendaSessoesComponent implements OnInit {
 
   constructor(private sessaoService: SessaoService) {}
 
-  ngOnInit(): void {
-    console.log('🔄 AgendaSessoesComponent - Iniciando carregamento...');
-    this.carregar();
-    this.carregarEstatisticas();
-  }
-
   carregar(): void {
-    const filtros: FiltrosSessao = {};
-
-    if (this.selectedPeriodo === 'custom') {
-      filtros.date = this.selectedDate;
-    } else {
-      filtros.periodo = this.selectedPeriodo as FiltrosSessao['periodo'];
-    }
-
-    if (this.selectedStatus !== 'todas') {
-      filtros.status = this.selectedStatus;
-    }
-
-    console.log('📊 Carregando sessões com filtros:', filtros);
-
-    this.sessaoService.listar(filtros).subscribe({
-      next: (dados) => {
-        console.log('✅ Sessões recebidas:', dados?.length || 0, 'registros');
-        this.sessoes = (dados ?? []).map((s) => ({
-          ...s,
-          status: this.normalizeStatus(s.status),
-          tipo: this.calcularTipo(s.dataHora),
-        }));
-        console.log('✅ Sessões processadas:', this.sessoes);
-      },
-      error: (err) => {
-        console.error('❌ Erro ao buscar sessões:', err);
-        console.error('❌ Status:', err.status);
-        console.error('❌ Message:', err.message);
-      },
-    });
+    this.refreshSessoesTick.update((v) => v + 1);
   }
 
   carregarEstatisticas(): void {
-    console.log('📈 Carregando estatísticas...');
-    this.sessaoService.obterEstatisticas().subscribe({
-      next: (stats) => {
-        console.log('✅ Estatísticas recebidas:', stats);
-        this.estatisticas = stats;
-      },
-      error: (err) => {
-        console.error('❌ Erro ao buscar estatísticas:', err);
-        console.error('❌ Status:', err.status);
-      },
-    });
+    this.refreshStatsTick.update((v) => v + 1);
   }
 
   onPeriodoChange(periodo: string): void {
     this.selectedPeriodo = periodo;
-    this.carregar();
   }
 
   onStatusChange(status: string): void {
     this.selectedStatus = status;
-    this.carregar();
   }
 
   onDateChange(value: string): void {
     this.selectedDate = value;
-    if (this.selectedPeriodo === 'custom') {
-      this.carregar();
-    }
   }
 
   pode(acao: SessaoAcao, sessao: Sessao): boolean {
@@ -157,23 +176,13 @@ export class AgendaSessoesComponent implements OnInit {
 
     switch (acao) {
       case 'COMPARECEU':
-        // Para avaliações, usa endpoint diferente (compareceu-avaliacao)
-        // Para sessões normais, pode marcar compareceu se não está cancelada
         return s !== 'cancelada';
-
       case 'FALTOU':
-        // Pode marcar falta se não está cancelada
         return s !== 'cancelada';
-
       case 'REMARCAR':
-        // Pode remarcar qualquer status (exceto cancelada)
-        // Mesmo que faltou, pode remarcar na mesma semana
         return s !== 'cancelada';
-
       case 'CANCELAR':
-        // Pode cancelar qualquer uma (menos já cancelada)
         return s !== 'cancelada';
-
       default:
         return false;
     }
@@ -185,10 +194,10 @@ export class AgendaSessoesComponent implements OnInit {
 
   marcarCompareceuAvaliacao(sessao: Sessao): void {
     if (!sessao.id) return;
-    
+
     this.sessaoService.marcarCompareceuAvaliacao(sessao.id).subscribe({
-      next: (updated) => {
-        this.updateRow(updated);
+      next: () => {
+        this.carregar();
         this.carregarEstatisticas();
       },
       error: (err) => console.error('Erro ao marcar compareceu avaliação', err),
@@ -201,8 +210,8 @@ export class AgendaSessoesComponent implements OnInit {
     if (acao === 'REMARCAR') {
       const novaIso = this.addOneDay(sessao.dataHora);
       this.sessaoService.remarcar(sessao.id, novaIso).subscribe({
-        next: (updated) => {
-          this.updateRow(updated);
+        next: () => {
+          this.carregar();
           this.carregarEstatisticas();
         },
         error: (err) => console.error('Erro ao remarcar', err),
@@ -220,8 +229,8 @@ export class AgendaSessoesComponent implements OnInit {
         : this.sessaoService.cancelar(sessao.id);
 
     call.subscribe({
-      next: (updated) => {
-        this.updateRow(updated);
+      next: () => {
+        this.carregar();
         this.carregarEstatisticas();
       },
       error: (err) => console.error('Erro ao aplicar ação', err),
@@ -262,12 +271,6 @@ export class AgendaSessoesComponent implements OnInit {
     }
   }
 
-  formatDateTime(iso: string): string {
-    const d = new Date(iso);
-    if (isNaN(d.getTime())) return '';
-    return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
-  }
-
   formatDate(iso: string): string {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return '';
@@ -289,19 +292,18 @@ export class AgendaSessoesComponent implements OnInit {
     return 'futura';
   }
 
-  private updateRow(updated: Sessao): void {
-    const normalized: SessaoComTipo = {
-      ...updated,
-      status: this.normalizeStatus(updated.status),
-      tipo: this.calcularTipo(updated.dataHora),
-    };
-    this.sessoes = this.sessoes.map((s) => (s.id === normalized.id ? normalized : s));
-  }
-
   private normalizeStatus(value: unknown): SessaoStatus {
     const s = String(value ?? '').toLowerCase();
-    const allowed: SessaoStatus[] = ['marcada', 'compareceu', 'faltou', 'cancelada', 'remarcada', 'aguardando_avaliacao', 'avaliada'];
-    return (allowed.includes(s as SessaoStatus) ? (s as SessaoStatus) : 'marcada');
+    const allowed: SessaoStatus[] = [
+      'marcada',
+      'compareceu',
+      'faltou',
+      'cancelada',
+      'remarcada',
+      'aguardando_avaliacao',
+      'avaliada',
+    ];
+    return allowed.includes(s as SessaoStatus) ? (s as SessaoStatus) : 'marcada';
   }
 
   private todayISO(): string {

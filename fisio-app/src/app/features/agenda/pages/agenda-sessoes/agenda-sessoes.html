@@ -16,7 +16,7 @@
     <div class="stat-card stat-hoje">
       <mat-icon>today</mat-icon>
       <div class="stat-content">
-        <span class="stat-value">{{ estatisticas.hoje }}</span>
+        <span class="stat-value">{{ estatisticas().hoje }}</span>
         <span class="stat-label">Hoje</span>
       </div>
     </div>
@@ -24,7 +24,7 @@
     <div class="stat-card stat-pendentes">
       <mat-icon>schedule</mat-icon>
       <div class="stat-content">
-        <span class="stat-value">{{ estatisticas.pendentes }}</span>
+        <span class="stat-value">{{ estatisticas().pendentes }}</span>
         <span class="stat-label">Pendentes</span>
       </div>
     </div>
@@ -32,7 +32,7 @@
     <div class="stat-card stat-compareceu">
       <mat-icon>check_circle</mat-icon>
       <div class="stat-content">
-        <span class="stat-value">{{ estatisticas.comparecidas }}</span>
+        <span class="stat-value">{{ estatisticas().comparecidas }}</span>
         <span class="stat-label">Compareceu</span>
       </div>
     </div>
@@ -40,7 +40,7 @@
     <div class="stat-card stat-faltou">
       <mat-icon>person_off</mat-icon>
       <div class="stat-content">
-        <span class="stat-value">{{ estatisticas.faltas }}</span>
+        <span class="stat-value">{{ estatisticas().faltas }}</span>
         <span class="stat-label">Faltas</span>
       </div>
     </div>
@@ -48,7 +48,7 @@
     <div class="stat-card stat-total">
       <mat-icon>assessment</mat-icon>
       <div class="stat-content">
-        <span class="stat-value">{{ estatisticas.total }}</span>
+        <span class="stat-value">{{ estatisticas().total }}</span>
         <span class="stat-label">Total</span>
       </div>
     </div>
@@ -102,7 +102,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let s of sessoes" [ngClass]="getTipoClass(s.tipo)">
+          <tr *ngFor="let s of sessoes()" [ngClass]="getTipoClass(s.tipo)">
             <td class="nome-cell">
               <span class="avatar-circle">{{ (s.pacienteNome?.charAt(0) || 'P') | uppercase }}</span>
               <span class="nome-text">{{ s.pacienteNome || s.pacienteId }}</span>
@@ -204,7 +204,7 @@
             </td>
           </tr>
 
-          <tr *ngIf="sessoes.length === 0">
+          <tr *ngIf="sessoes().length === 0">
             <td colspan="7" class="empty-row">
               <mat-icon>event_busy</mat-icon>
               <p>Nenhuma sessão encontrada para os filtros selecionados.</p>
