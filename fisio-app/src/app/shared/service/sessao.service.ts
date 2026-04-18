@@ -28,6 +28,8 @@ export interface EstatisticasSessao {
   remarcadas: number;
 }
 
+export type RemarcacaoEscopo = 'somente_esta' | 'esta_e_proximas' | 'toda_serie';
+
 @Injectable({ providedIn: 'root' })
 export class SessaoService {
   private readonly baseUrl = '/api/sessoes';
@@ -70,10 +72,11 @@ export class SessaoService {
     return this.http.patch<Sessao>(`${this.baseUrl}/${id}/cancelar`, {});
   }
 
-  remarcar(id: string, novaDataHoraISO: string): Observable<Sessao> {
+  remarcar(id: string, novaDataHoraISO: string, escopo: RemarcacaoEscopo = 'somente_esta'): Observable<Sessao> {
     // backend espera Instant, ex: 2026-02-14T14:00:00.000Z
     return this.http.patch<Sessao>(`${this.baseUrl}/${id}/remarcar`, {
       dataHora: novaDataHoraISO,
+      escopo,
     });
   }
 

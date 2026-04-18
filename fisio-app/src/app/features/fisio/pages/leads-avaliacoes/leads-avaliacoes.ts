@@ -51,7 +51,7 @@ export class LeadsAvaliacoes {
 
   private mapPendentes(
     sessoes: Sessao[]
-  ): Array<{ id: string; nome: string; data: Date | null; telefone: string; origem: 'Lead' | 'Paciente'; status: string }> {
+  ): Array<{ id: string; nome: string; data: Date | null; telefone: string; origem: 'Contato' | 'Paciente'; status: string }> {
     return (sessoes ?? [])
       .filter((s) => {
         const status = this.normalizeText(s.status);
@@ -62,7 +62,7 @@ export class LeadsAvaliacoes {
         nome: String(s.pacienteNome ?? (s.pacienteId ? `Paciente ${s.pacienteId}` : 'Paciente')).trim(),
         telefone: String(s.pacienteTelefone ?? '-'),
         data: this.parseApiDate(s.dataHora),
-        origem: (!s.pacienteId || !!s.leadId ? 'Lead' : 'Paciente') as 'Lead' | 'Paciente',
+        origem: (!s.pacienteId || !!s.leadId ? 'Contato' : 'Paciente') as 'Contato' | 'Paciente',
         status: this.normalizeText(s.status),
       }))
       .filter((p) => !!p.id)

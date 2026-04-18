@@ -10,6 +10,16 @@ export type LeadAcao =
   | 'CANCELAR'
   | 'AGENDAR_AVALIACAO';
 
+export interface AgendarAvaliacaoRequest {
+    dataHora: string;
+    observacao?: string;
+    modoAgendamento?: 'avulso' | 'recorrente';
+    frequenciaSemanal?: number;
+    quantidadeSessoes?: number;
+    validadeGuiaDias?: number;
+    diasSemanaPreferidos?: Array<'SEG' | 'TER' | 'QUA' | 'QUI' | 'SEX' | 'SAB' | 'DOM'>;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -71,7 +81,7 @@ export class LeadService extends BaseService<Lead> {
 
     agendarAvaliacao(
         leadId: string | number,
-        body: { dataHora: string; observacao?: string }
+        body: AgendarAvaliacaoRequest
     ): Observable<any> {
         const url = `${this.getFullUrl()}/${leadId}/agendar-avaliacao`;
         return this.http.post(url, body);

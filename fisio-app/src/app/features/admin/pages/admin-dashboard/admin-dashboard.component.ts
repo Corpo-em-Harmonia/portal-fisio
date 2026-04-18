@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, computed, signal } from '@angular/core';
+import { httpResource } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { SessaoService, EstatisticasSessao } from '../../../../shared/service/sessao.service';
+import { EstatisticasSessao } from '../../../../shared/service/sessao.service';
 import { Sessao } from '../../../../shared/models/sessao';
 import { DashboardAgendamento, DashboardPaciente } from './admin-dashboard.models';
 
@@ -14,7 +15,7 @@ import { DashboardAgendamento, DashboardPaciente } from './admin-dashboard.model
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule, MatSnackBarModule]
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent {
   currentDate = new Date();
   selectedDay = new Date();
   selectedPaciente = '';
@@ -39,13 +40,40 @@ export class AdminDashboardComponent implements OnInit {
 
   years: number[] = [];
 
-  estatisticasApi: EstatisticasSessao | null = null;
+  private readonly refreshSessoesTick = signal(0);
+  private readonly refreshEstatisticasTick = signal(0);
+
+  readonly sessoesResource = httpResource<Sessao[]>(
+    () => {
+      this.refreshSessoesTick();
+      return '/api/sessoes?periodo=todos';
+    },
+    { defaultValue: [] }
+  );
+
+  readonly estatisticasApiResource = httpResource<EstatisticasSessao | null>(
+    () => {
+      this.refreshEstatisticasTick();
+      return '/api/sessoes/estatisticas';
+    },
+    { defaultValue: null }
+  );
+
+  private readonly agendamentosSignal = computed<DashboardAgendamento[]>(() =>
+    (this.sessoesResource.value() ?? []).map((s) => this.mapSessaoToDashboardAgendamento(s))
+  );
+
+  private readonly pacientesSignal = computed<DashboardPaciente[]>(() =>
+    this.montarPacientes(this.sessoesResource.value() ?? [])
+  );
+
+  private readonly estatisticasApiSignal = computed<EstatisticasSessao | null>(
+    () => this.estatisticasApiResource.value()
+  );
 
   constructor(
     private router: Router,
     private snackBar: MatSnackBar,
-    private sessaoService: SessaoService,
-    private ngZone: NgZone,
   ) {
     const currentYear = new Date().getFullYear();
     for (let i = currentYear - 5; i <= currentYear + 2; i++) {
@@ -53,13 +81,17 @@ export class AdminDashboardComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
-    this.carregarDashboard();
+  get agendamentos(): DashboardAgendamento[] {
+    return this.agendamentosSignal();
   }
 
-  agendamentos: DashboardAgendamento[] = [];
+  get pacientes(): DashboardPaciente[] {
+    return this.pacientesSignal();
+  }
 
-  pacientes: DashboardPaciente[] = [];
+  get estatisticasApi(): EstatisticasSessao | null {
+    return this.estatisticasApiSignal();
+  }
 
   getWeekDays() {
     const days = [];
@@ -243,31 +275,6 @@ export class AdminDashboardComponent implements OnInit {
       weekday: 'long',
       day: '2-digit',
       month: '2-digit',
-    });
-  }
-
-  private carregarDashboard(): void {
-    this.sessaoService.listar({ periodo: 'todos' }).subscribe({
-      next: (sessoes) => {
-        this.ngZone.run(() => {
-          this.agendamentos = (sessoes ?? []).map((s) => this.mapSessaoToDashboardAgendamento(s));
-          this.pacientes = this.montarPacientes(sessoes ?? []);
-        });
-      },
-      error: (err) => {
-        console.error('Erro ao carregar sessões do dashboard', err);
-      },
-    });
-
-    this.sessaoService.obterEstatisticas().subscribe({
-      next: (stats) => {
-        this.ngZone.run(() => {
-          this.estatisticasApi = stats;
-        });
-      },
-      error: (err) => {
-        console.error('Erro ao carregar estatísticas do dashboard', err);
-      },
     });
   }
 

@@ -48,6 +48,7 @@ export class AgendaSessoesComponent {
   private readonly selectedDateSignal = signal(this.todayISO());
   private readonly selectedPeriodoSignal = signal<string>('pendentes');
   private readonly selectedStatusSignal = signal<string>('todas');
+  private readonly selectedPacienteQuerySignal = signal('');
   private readonly refreshSessoesTick = signal(0);
   private readonly refreshStatsTick = signal(0);
 
@@ -95,7 +96,7 @@ export class AgendaSessoesComponent {
     }
   );
 
-  readonly sessoes = computed<SessaoComTipo[]>(() =>
+  readonly sessoesBase = computed<SessaoComTipo[]>(() =>
     (this.sessoesResource.value() ?? []).map((s) => ({
       ...s,
       status: this.normalizeStatus(s.status),
@@ -103,7 +104,72 @@ export class AgendaSessoesComponent {
     }))
   );
 
+  readonly sessoes = computed<SessaoComTipo[]>(() => {
+    const query = this.normalizeText(this.selectedPacienteQuerySignal());
+    const base = this.sessoesBase();
+    if (!query) return base;
+
+    return base.filter((s) => {
+      const cpf = String((s as unknown as Record<string, unknown>)['pacienteCpf'] ?? '');
+      const nome = String(s.pacienteNome ?? '');
+      const telefone = String(s.pacienteTelefone ?? '');
+      const id = String(s.pacienteId ?? '');
+      const blob = this.normalizeText(`${nome} ${telefone} ${cpf} ${id}`);
+      return blob.includes(query);
+    });
+  });
+
+  readonly pacientesSemProximaSessao = computed<
+    Array<{ pacienteId: string; nome: string; telefone: string; ultimaSessao: string }>
+  >(() => {
+    const agora = new Date();
+    const porPaciente = new Map<
+      string,
+      { nome: string; telefone: string; temFuturo: boolean; ultimaSessao: Date | null }
+    >();
+
+    for (const s of this.sessoesBase()) {
+      const pacienteId = String(s.pacienteId ?? '').trim();
+      const nome = String(s.pacienteNome ?? '').trim();
+      if (!pacienteId || !nome) continue;
+      if (s.status === 'cancelada') continue;
+
+      const data = new Date(s.dataHora);
+      if (isNaN(data.getTime())) continue;
+
+      const atual = porPaciente.get(pacienteId) ?? {
+        nome,
+        telefone: String(s.pacienteTelefone ?? '-'),
+        temFuturo: false,
+        ultimaSessao: null,
+      };
+
+      if (data > agora) {
+        atual.temFuturo = true;
+      } else if (!atual.ultimaSessao || data > atual.ultimaSessao) {
+        atual.ultimaSessao = data;
+      }
+
+      porPaciente.set(pacienteId, atual);
+    }
+
+    return Array.from(porPaciente.entries())
+      .filter(([, v]) => !v.temFuturo && !!v.ultimaSessao)
+      .map(([pacienteId, v]) => ({
+        pacienteId,
+        nome: v.nome,
+        telefone: v.telefone,
+        ultimaSessao: v.ultimaSessao?.toISOString() ?? '',
+      }))
+      .sort((a, b) => (a.ultimaSessao < b.ultimaSessao ? 1 : -1));
+  });
+
   readonly estatisticas = computed(() => this.estatisticasResource.value());
+
+  isRemarcarModalOpen = false;
+  sessaoSelecionadaParaRemarcar: Sessao | null = null;
+  novaDataRemarcacao = '';
+  novaHoraRemarcacao = '';
 
   get selectedDate(): string {
     return this.selectedDateSignal();
@@ -127,6 +193,14 @@ export class AgendaSessoesComponent {
 
   set selectedStatus(value: string) {
     this.selectedStatusSignal.set(value);
+  }
+
+  get selectedPacienteQuery(): string {
+    return this.selectedPacienteQuerySignal();
+  }
+
+  set selectedPacienteQuery(value: string) {
+    this.selectedPacienteQuerySignal.set(value);
   }
 
   periodos = [
@@ -171,6 +245,14 @@ export class AgendaSessoesComponent {
     this.selectedDate = value;
   }
 
+  onPacienteQueryChange(value: string): void {
+    this.selectedPacienteQuery = value;
+  }
+
+  aplicarFiltroPaciente(value: string): void {
+    this.selectedPacienteQuery = value;
+  }
+
   pode(acao: SessaoAcao, sessao: Sessao): boolean {
     const s = sessao.status;
 
@@ -208,14 +290,7 @@ export class AgendaSessoesComponent {
     if (!sessao.id) return;
 
     if (acao === 'REMARCAR') {
-      const novaIso = this.addOneDay(sessao.dataHora);
-      this.sessaoService.remarcar(sessao.id, novaIso).subscribe({
-        next: () => {
-          this.carregar();
-          this.carregarEstatisticas();
-        },
-        error: (err) => console.error('Erro ao remarcar', err),
-      });
+      this.abrirModalRemarcacao(sessao);
       return;
     }
 
@@ -271,6 +346,17 @@ export class AgendaSessoesComponent {
     }
   }
 
+  getAgendamentoLabel(sessao: Sessao): string {
+    if (sessao.serieId) {
+      return `Recorrente${sessao.numeroOcorrencia ? ` #${sessao.numeroOcorrencia}` : ''}`;
+    }
+    return 'Avulso';
+  }
+
+  getAgendamentoClass(sessao: Sessao): string {
+    return sessao.serieId ? 'tag-recorrente' : 'tag-avulso';
+  }
+
   formatDate(iso: string): string {
     const d = new Date(iso);
     if (isNaN(d.getTime())) return '';
@@ -318,6 +404,82 @@ export class AgendaSessoesComponent {
     const d = new Date(iso);
     d.setDate(d.getDate() + 1);
     return d.toISOString();
+  }
+
+  abrirModalRemarcacao(sessao: Sessao): void {
+    const atual = new Date(sessao.dataHora);
+    if (isNaN(atual.getTime())) {
+      window.alert('Não foi possível abrir edição: data atual inválida.');
+      return;
+    }
+
+    this.sessaoSelecionadaParaRemarcar = sessao;
+    this.novaDataRemarcacao = this.toDateInputValue(atual);
+    this.novaHoraRemarcacao = this.toTimeInputValue(atual);
+    this.isRemarcarModalOpen = true;
+  }
+
+  fecharModalRemarcacao(): void {
+    this.isRemarcarModalOpen = false;
+    this.sessaoSelecionadaParaRemarcar = null;
+    this.novaDataRemarcacao = '';
+    this.novaHoraRemarcacao = '';
+  }
+
+  confirmarRemarcacao(): void {
+    const sessao = this.sessaoSelecionadaParaRemarcar;
+    if (!sessao?.id) return;
+
+    const combinada = new Date(`${this.novaDataRemarcacao}T${this.novaHoraRemarcacao}:00`);
+    if (isNaN(combinada.getTime())) {
+      window.alert('Data ou horário inválidos.');
+      return;
+    }
+
+    if (this.isWeekend(combinada)) {
+      window.alert('Sábado e domingo estão bloqueados para agendamento/remarcação.');
+      return;
+    }
+
+    // Remarcação sempre manual por sessão para dar controle total para a recepção.
+    this.sessaoService.remarcar(sessao.id, combinada.toISOString(), 'somente_esta').subscribe({
+      next: () => {
+        this.carregar();
+        this.carregarEstatisticas();
+        this.fecharModalRemarcacao();
+      },
+      error: (err) => {
+        console.error('Erro ao remarcar', err);
+        const mensagem = String(err?.error?.mensagem ?? 'Não foi possível remarcar a sessão.');
+        window.alert(mensagem);
+      },
+    });
+  }
+
+  private toDateInputValue(date: Date): string {
+    const yyyy = String(date.getFullYear());
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  private toTimeInputValue(date: Date): string {
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    return `${hh}:${mm}`;
+  }
+
+  private normalizeText(value: unknown): string {
+    return String(value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
+  private isWeekend(date: Date): boolean {
+    const day = date.getDay();
+    return day === 0 || day === 6;
   }
 
   private isPrimeiraAvaliacao(sessao: Sessao): boolean {

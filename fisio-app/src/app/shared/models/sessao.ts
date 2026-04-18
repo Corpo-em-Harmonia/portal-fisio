@@ -14,6 +14,10 @@ export interface Sessao {
   pacienteId: string;
   leadId?: string;
 
+  // Identificacao de serie para sessoes recorrentes
+  serieId?: string;
+  numeroOcorrencia?: number;
+
   // opcional: se seu backend já retornar nome/telefone junto, melhor pra UI
   pacienteNome?: string;
   pacienteTelefone?: string;

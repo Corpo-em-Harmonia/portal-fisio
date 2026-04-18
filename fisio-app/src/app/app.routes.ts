@@ -8,22 +8,6 @@ export const routes: Routes = [
         .then(m => m.HomeComponent)
   },
   {
-    path: 'avaliacao',
-    children: [
-      {
-        path: 'form',
-        loadComponent: () =>
-          import('./features/avaliacao/pages/avaliacao-form/avaliacao-form')
-            .then(m => m.AvaliacaoForm)
-      },
-      {
-        path: '',
-        redirectTo: 'form',
-        pathMatch: 'full'
-      }
-    ]
-  },
-  {
     path: 'leads',
     loadComponent: () =>
       import('./features/leads/pages/leads-list/leads-list')

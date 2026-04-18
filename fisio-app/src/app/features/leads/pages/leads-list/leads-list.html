@@ -9,27 +9,27 @@
         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
       </svg>
     </div>
-    <h1 class="paciente-list-title">Leads - Recepção</h1>
+    <h1 class="paciente-list-title">Contatos - Recepção</h1>
   </div>
 
   <button mat-raised-button color="primary" type="button" (click)="abrirCadastroManual()">
-    + Novo lead
+    + Novo contato
   </button>
 
   <p class="text-gray-600">Gerencie contato, agendamento e comparecimento</p>
 
   <!-- Loading State -->
-  <div *ngIf="isLoading" style="padding: 40px; text-align: center;">
-    <p>Carregando leads...</p>
+  <div *ngIf="isLoading()" style="padding: 40px; text-align: center;">
+    <p>Carregando contatos...</p>
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && leads.length === 0" style="padding: 40px; text-align: center;">
-    <p>Nenhum lead encontrado. Crie um novo lead para começar!</p>
+  <div *ngIf="!isLoading() && leads().length === 0" style="padding: 40px; text-align: center;">
+    <p>Nenhum contato encontrado. Crie um novo contato para começar!</p>
   </div>
 
   <!-- Table with Data -->
-  <div class="paciente-list-table" *ngIf="!isLoading && leads.length > 0">
+  <div class="paciente-list-table" *ngIf="!isLoading() && leads().length > 0">
     <div style="overflow-x:auto;">
       <table>
         <thead>
@@ -43,7 +43,7 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let lead of leads; trackBy: trackById" (click)="onSelectLead(lead)">
+          <tr *ngFor="let lead of leads(); trackBy: trackById" (click)="onSelectLead(lead)">
             <td class="nome-cell">
               <span class="avatar-circle">{{ getInitial(lead.nome) }}</span>
               <span>{{ lead.nome }}</span>
@@ -123,17 +123,17 @@
 </div>
 
 <app-modal-cadastro
-  [visible]="isCadastroManualOpen"
+  [visible]="isCadastroManualOpen()"
   [modoInterno]="true"
-  titulo="Novo lead"
+  titulo="Novo contato"
   descricao="Cadastre manualmente um novo contato."
   (buttonClick)="onCadastroManual($event)"
   (close)="fecharCadastroManual()">
 </app-modal-cadastro>
 
 <app-modal-agendar-avaliacao
-  [visible]="isAgendarModalOpen"
-  [lead]="leadSelecionadoParaAgendar"
+  [visible]="isAgendarModalOpen()"
+  [lead]="leadSelecionadoParaAgendar()"
   (close)="fecharModalAgendamento()"
   (confirmarAgendamento)="onConfirmarAgendamento($event)">
 </app-modal-agendar-avaliacao>

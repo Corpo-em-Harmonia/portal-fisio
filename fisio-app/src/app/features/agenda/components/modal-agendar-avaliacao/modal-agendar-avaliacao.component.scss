@@ -88,6 +88,73 @@
   margin-bottom: 16px;
 }
 
+.recorrencia-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.dias-semana {
+  margin: 4px 0 16px;
+}
+
+.dias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.dia-btn {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #334155;
+
+  &.selected {
+    border-color: #1d4ed8;
+    background: #eff6ff;
+    color: #1e3a8a;
+    font-weight: 600;
+  }
+}
+
+.dias-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #334155;
+}
+
+.guia-alerta {
+  margin-bottom: 16px;
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.guia-linha {
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+.guia-ok {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #166534;
+}
+
+.guia-erro {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #991b1b;
+}
+
 .horarios-section {
   margin-bottom: 24px;
 }

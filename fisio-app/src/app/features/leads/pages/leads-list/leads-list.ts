@@ -1,8 +1,13 @@
-import { Component, OnInit, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { httpResource } from '@angular/common/http';
 
-import { LeadService, LeadAcao } from '../../../../shared/service/lead.service';
+import {
+  LeadService,
+  LeadAcao,
+  AgendarAvaliacaoRequest,
+} from '../../../../shared/service/lead.service';
 import { Lead, LeadStatus, LeadHelper } from '../../../../shared/models/lead';
 
 import { MatIconModule } from '@angular/material/icon';
@@ -10,7 +15,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { ModalCadastroComponent } from '../../../home/components/modal-cadastro/modal-cadastro.component';
-import { ModalAgendarAvaliacaoComponent } from '../../../agenda/components/modal-agendar-avaliacao/modal-agendar-avaliacao.component';
+import {
+  ModalAgendarAvaliacaoComponent,
+  ConfirmarAgendamentoPayload,
+} from '../../../agenda/components/modal-agendar-avaliacao/modal-agendar-avaliacao.component';
 import {
   getStatusLabel,
   getStatusClass,
@@ -33,63 +41,85 @@ import {
   templateUrl: './leads-list.html',
   styleUrls: ['./leads-list.scss'],
 })
-export class LeadsList implements OnInit {
-  leads: Lead[] = [];
-  isCadastroManualOpen = false;
-  isLoading = false;
-  leadSelecionadoParaAgendar?: Lead;
-  isAgendarModalOpen = false;
+export class LeadsList {
+  private readonly refreshLeadsTick = signal(0);
+
+  readonly leadsResource = httpResource<Lead[]>(
+    () => {
+      this.refreshLeadsTick();
+      return '/api/leads?ativos=true';
+    },
+    { defaultValue: [] }
+  );
+
+  readonly leads = computed(() => this.leadsResource.value() ?? []);
+  readonly isCadastroManualOpen = signal(false);
+  readonly isLoading = computed(() => this.leadsResource.isLoading());
+  readonly leadSelecionadoParaAgendar = signal<Lead | undefined>(undefined);
+  readonly isAgendarModalOpen = signal(false);
+
   constructor(
     private router: Router,
-    private leadService: LeadService,
-    private cdr: ChangeDetectorRef
+    private leadService: LeadService
   ) { }
 
-  ngOnInit(): void {
-    this.carregarLeads();
-  }
-
-  private carregarLeads(): void {
-    this.isLoading = true;
-
-    this.leadService.getLeadsAtivos().subscribe({
-      next: (leads) => {
-        this.leads = [...leads]; // Cria nova referência
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        this.isLoading = false;
-        this.handleError('Erro ao buscar leads', err);
-        this.cdr.markForCheck();
-      },
-    });
+  private recarregarLeads(): void {
+    this.refreshLeadsTick.update((v) => v + 1);
   }
 
   abrirModalAgendamento(lead: Lead): void {
-    this.leadSelecionadoParaAgendar = lead;
-    this.isAgendarModalOpen = true;
+    this.leadSelecionadoParaAgendar.set(lead);
+    this.isAgendarModalOpen.set(true);
   }
 
   fecharModalAgendamento(): void {
-    this.isAgendarModalOpen = false;
-    this.leadSelecionadoParaAgendar = undefined;
+    this.isAgendarModalOpen.set(false);
+    this.leadSelecionadoParaAgendar.set(undefined);
   }
 
-  onConfirmarAgendamento(evento: { data: string; hora: string; observacao?: string }): void {
-    if (!this.leadSelecionadoParaAgendar?.id) return;
+  onConfirmarAgendamento(evento: ConfirmarAgendamentoPayload): void {
+    const leadSelecionado = this.leadSelecionadoParaAgendar();
+    if (!leadSelecionado?.id) return;
 
-    const payload = {
+    const payload: AgendarAvaliacaoRequest = {
       dataHora: `${evento.data}T${evento.hora}:00`,
-      observacao: evento.observacao
+      observacao: evento.observacao,
+      modoAgendamento: evento.modoAgendamento,
+      frequenciaSemanal: evento.frequenciaSemanal,
+      quantidadeSessoes: evento.quantidadeSessoes,
+      validadeGuiaDias: evento.validadeGuiaDias,
+      diasSemanaPreferidos: evento.diasSemanaPreferidos,
     };
 
-    this.leadService.agendarAvaliacao(this.leadSelecionadoParaAgendar.id, payload).subscribe({
+    this.leadService.agendarAvaliacao(leadSelecionado.id, payload).subscribe({
       next: () => {
-        this.carregarLeads();
+        this.recarregarLeads();
         this.fecharModalAgendamento(); // ✅ aqui fecha
       },
-      error: (err) => console.error('Erro ao agendar avaliação', err),
+      error: (err) => {
+        const codigo = String(err?.error?.codigo ?? '');
+        if (codigo === 'PLANO_FORA_DA_VALIDADE') {
+          const detalhes = err?.error?.detalhes ?? {};
+          const duracao = detalhes?.duracaoDias;
+          const validade = detalhes?.validadeGuiaDias;
+          const freq = detalhes?.frequenciaMinimaSugerida;
+          const mensagem = [
+            'Plano fora da validade da guia.',
+            duracao ? `Duração estimada: ${duracao} dias.` : '',
+            validade ? `Validade da guia: ${validade} dias.` : '',
+            freq ? `Sugestão: pelo menos ${freq} sessões por semana.` : '',
+          ]
+            .filter(Boolean)
+            .join('\n');
+
+          window.alert(mensagem);
+          return;
+        }
+
+        const mensagem = String(err?.error?.mensagem ?? 'Erro ao agendar avaliação.');
+        window.alert(mensagem);
+        console.error('Erro ao agendar avaliação', err);
+      },
     });
   }
 
@@ -116,18 +146,11 @@ export class LeadsList implements OnInit {
     if (!lead.id) return;
 
     this.leadService.aplicarAcao(lead.id, acao).subscribe({
-      next: (updated) => {
-        this.atualizarLeadNaLista(updated);
-        this.cdr.markForCheck();
+      next: () => {
+        this.recarregarLeads();
       },
       error: (err) => this.handleError('Erro ao aplicar ação', err),
     });
-  }
-
-  private atualizarLeadNaLista(updated: Lead): void {
-    this.leads = this.leads.map((l) =>
-      String(l.id) === String(updated.id) ? updated : l
-    );
   }
 
   formatDate(dateString: string | null | undefined): string {
@@ -153,11 +176,11 @@ export class LeadsList implements OnInit {
   }
 
   abrirCadastroManual(): void {
-    this.isCadastroManualOpen = true;
+    this.isCadastroManualOpen.set(true);
   }
 
   fecharCadastroManual(): void {
-    this.isCadastroManualOpen = false;
+    this.isCadastroManualOpen.set(false);
   }
 
   excluirLead(lead: Lead): void {
@@ -166,8 +189,7 @@ export class LeadsList implements OnInit {
 
     this.leadService.excluir(lead.id).subscribe({
       next: () => {
-        this.leads = this.leads.filter(l => l.id !== lead.id);
-        this.cdr.markForCheck();
+        this.recarregarLeads();
       },
       error: (err) => this.handleError('Erro ao excluir lead', err),
     });
@@ -179,15 +201,13 @@ onCadastroManual(event: { action: 'criar-lead' | string; value?: Partial<Lead>; 
 
   this.leadService.criarLead(event.value as Lead).subscribe({
     next: (novo) => {
-      this.leads = [novo, ...this.leads];
+      this.recarregarLeads();
       this.fecharCadastroManual();
 
       // ✅ Só abre se marcou a opção
       if (event.agendarAgora) {
         this.abrirModalAgendamento(novo);
       }
-
-      this.cdr.markForCheck();
     },
     error: (err) => this.handleError('Erro ao criar lead manual', err),
   });

@@ -16,10 +16,73 @@
     <form [formGroup]="form" (ngSubmit)="confirmar()">
       <mat-form-field appearance="outline" class="modal-field">
         <mat-label>Data</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="data" [min]="minDate" placeholder="Selecione a data">
+        <input
+          matInput
+          [matDatepicker]="picker"
+          formControlName="data"
+          [min]="minDate"
+          [matDatepickerFilter]="weekdaysOnlyFilter"
+          placeholder="Selecione a data">
         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
+        <mat-hint>Sábado e domingo bloqueados</mat-hint>
       </mat-form-field>
+
+      <mat-form-field appearance="outline" class="modal-field">
+        <mat-label>Forma de agendamento</mat-label>
+        <mat-select formControlName="modoAgendamento">
+          <mat-option value="avulso">Avulso (definir sessão a sessão)</mat-option>
+          <mat-option value="recorrente">Recorrente (dias fixos)</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <div class="recorrencia-grid" *ngIf="isRecorrente">
+        <mat-form-field appearance="outline" class="modal-field">
+          <mat-label>Quantidade de sessões</mat-label>
+          <input matInput type="number" min="1" formControlName="quantidadeSessoes" placeholder="Ex: 8">
+          <mat-hint>Total de sessões a gerar no plano</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="modal-field">
+          <mat-label>Validade da guia (dias)</mat-label>
+          <input matInput type="number" min="1" formControlName="validadeGuiaDias" placeholder="Ex: 30">
+          <mat-hint>Padrão: 30 dias</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <div class="dias-semana" *ngIf="isRecorrente">
+        <label class="horarios-label">Escolha os dias da semana</label>
+        <div class="dias-grid">
+          <button
+            type="button"
+            class="dia-btn"
+            *ngFor="let dia of diasSemanaOptions"
+            [class.selected]="isDiaSelecionado(dia.codigo)"
+            (click)="toggleDiaSemana(dia.codigo)">
+            {{ dia.label }}
+          </button>
+        </div>
+        <div class="dias-hint" *ngIf="diasSemanaSelecionados.length > 0">
+          Frequência calculada automaticamente: <strong>{{ diasSemanaSelecionados.length }}x/semana</strong>
+        </div>
+      </div>
+
+      <div class="guia-alerta" *ngIf="isRecorrente">
+        <div class="guia-linha" *ngIf="getDuracaoPlanoDiasPorDiasSelecionados() as duracaoPlano">
+          Duração estimada do plano: <strong>{{ duracaoPlano }} dias</strong>
+        </div>
+        <div class="guia-linha" *ngIf="getValidadeGuiaDias() as validade">
+          Validade da guia: <strong>{{ validade }} dias</strong>
+        </div>
+        <div class="guia-ok" *ngIf="isPlanoRecorrenteViavel()">
+          Plano viável dentro da validade da guia.
+        </div>
+        <div class="guia-erro" *ngIf="!isPlanoRecorrenteViavel()">
+          Este plano não fecha na validade da guia. Sugestão: no mínimo
+          <strong>{{ getFrequenciaMinimaSugerida() }}</strong>
+          sessões por semana.
+        </div>
+      </div>
 
       <div class="horarios-section" *ngIf="form.get('data')?.value">
         <label class="horarios-label">Horário *</label>

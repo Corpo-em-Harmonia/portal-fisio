@@ -79,10 +79,39 @@
       </mat-select>
     </mat-form-field>
 
+    <mat-form-field appearance="outline" class="filter-field filter-field-busca">
+      <mat-label>Buscar pessoa (nome, CPF, telefone)</mat-label>
+      <input
+        matInput
+        type="text"
+        [(ngModel)]="selectedPacienteQuery"
+        (input)="onPacienteQueryChange($any($event.target).value)"
+        placeholder="Digite para filtrar" />
+    </mat-form-field>
+
     <button mat-raised-button color="primary" type="button" (click)="carregar()">
       <mat-icon>refresh</mat-icon>
       Atualizar
     </button>
+  </div>
+
+  <div class="avulso-pendencias" *ngIf="pacientesSemProximaSessao().length > 0">
+    <div class="avulso-header">
+      <h3>Pacientes sem próxima sessão</h3>
+      <span>Use para continuar agendamento avulso</span>
+    </div>
+
+    <div class="avulso-lista">
+      <div class="avulso-item" *ngFor="let p of pacientesSemProximaSessao() | slice:0:8">
+        <div class="avulso-info">
+          <strong>{{ p.nome }}</strong>
+          <small>{{ p.telefone }} · Última: {{ formatDate(p.ultimaSessao) }}</small>
+        </div>
+        <button mat-stroked-button type="button" (click)="aplicarFiltroPaciente(p.nome)">
+          Buscar na agenda
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- Tabela de sessões -->
@@ -129,6 +158,9 @@
 
             <td>
               <div class="tipo-badges">
+                <span class="agendamento-tag" [ngClass]="getAgendamentoClass(s)">
+                  {{ getAgendamentoLabel(s) }}
+                </span>
                 <mat-chip *ngIf="s.tipo" [ngClass]="getTipoClass(s.tipo)" class="tipo-chip">
                   {{ getTipoLabel(s.tipo) }}
                 </mat-chip>
@@ -165,7 +197,7 @@
 
                   <button mat-menu-item (click)="aplicarAcao(s, 'REMARCAR')" [disabled]="!pode('REMARCAR', s)">
                     <mat-icon>schedule</mat-icon>
-                    <span>Remarcar avaliação (+1 dia)</span>
+                    <span>Editar/Remarcar avaliação</span>
                   </button>
 
                   <mat-divider></mat-divider>
@@ -190,7 +222,7 @@
 
                   <button mat-menu-item (click)="aplicarAcao(s, 'REMARCAR')" [disabled]="!pode('REMARCAR', s)">
                     <mat-icon>schedule</mat-icon>
-                    <span>Remarcar (+1 dia)</span>
+                    <span>Editar/Remarcar sessão</span>
                   </button>
 
                   <mat-divider></mat-divider>
@@ -230,6 +262,41 @@
       <div class="legend-item">
         <span class="legend-dot tipo-futura"></span>
         <span>Futura</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="custom-modal" *ngIf="isRemarcarModalOpen">
+    <div class="custom-modal-content">
+      <button class="custom-modal-close" (click)="fecharModalRemarcacao()">×</button>
+
+      <h2 class="modal-title">Editar/Remarcar Sessão</h2>
+      <p class="modal-desc">Altere data, horário e o escopo da alteração.</p>
+
+      <div class="remarcar-grid">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Nova data</mat-label>
+          <input matInput type="date" [(ngModel)]="novaDataRemarcacao" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Novo horário</mat-label>
+          <input matInput type="time" [(ngModel)]="novaHoraRemarcacao" />
+        </mat-form-field>
+      </div>
+
+      <p class="remarcar-hint">
+        Alteração aplicada somente nesta sessão. Para futuras, edite cada sessão com liberdade total.
+      </p>
+      <p class="remarcar-hint remarcar-hint-warning">
+        Sábado e domingo estão bloqueados.
+      </p>
+
+      <div class="modal-actions modal-actions-row">
+        <button mat-button type="button" (click)="fecharModalRemarcacao()">Cancelar</button>
+        <button mat-raised-button color="primary" type="button" (click)="confirmarRemarcacao()">
+          Salvar alteração
+        </button>
       </div>
     </div>
   </div>
